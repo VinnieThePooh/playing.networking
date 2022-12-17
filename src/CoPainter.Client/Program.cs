@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace CoPainter.Client;
 
 static class Program

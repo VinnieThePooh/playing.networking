@@ -6,6 +6,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoPainter.Client", "CoPaint
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoPainter.Server", "CoPainter.Server\CoPainter.Server.csproj", "{59957FFB-5054-41CA-8E30-0CBA423C5C9C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ImageRetranslation", "ImageRetranslation", "{8CEA60B7-942E-4C66-B481-84C6D6273FEF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageSourceClient", "ImageSourceClient\ImageSourceClient.csproj", "{1937B12D-1AC4-4406-98C3-92568D9B1810}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageRetranslation.Shared", "ImageRetranslation.Shared\ImageRetranslation.Shared.csproj", "{B892F6C9-03BC-4DF6-8D57-F047E9CA99BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetranslationServer", "RetranslationServer\RetranslationServer.csproj", "{08B7A5E3-4DC9-4679-96C9-03E2F471B860}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,6 +22,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{8282BDA6-5625-4B7D-9CB5-67B69A1A18D9} = {F635DB7E-8511-4D62-8DCB-73B349762BE4}
 		{59957FFB-5054-41CA-8E30-0CBA423C5C9C} = {F635DB7E-8511-4D62-8DCB-73B349762BE4}
+		{1937B12D-1AC4-4406-98C3-92568D9B1810} = {8CEA60B7-942E-4C66-B481-84C6D6273FEF}
+		{B892F6C9-03BC-4DF6-8D57-F047E9CA99BD} = {8CEA60B7-942E-4C66-B481-84C6D6273FEF}
+		{08B7A5E3-4DC9-4679-96C9-03E2F471B860} = {8CEA60B7-942E-4C66-B481-84C6D6273FEF}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{8282BDA6-5625-4B7D-9CB5-67B69A1A18D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -24,5 +35,17 @@ Global
 		{59957FFB-5054-41CA-8E30-0CBA423C5C9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59957FFB-5054-41CA-8E30-0CBA423C5C9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59957FFB-5054-41CA-8E30-0CBA423C5C9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1937B12D-1AC4-4406-98C3-92568D9B1810}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1937B12D-1AC4-4406-98C3-92568D9B1810}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1937B12D-1AC4-4406-98C3-92568D9B1810}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1937B12D-1AC4-4406-98C3-92568D9B1810}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B892F6C9-03BC-4DF6-8D57-F047E9CA99BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B892F6C9-03BC-4DF6-8D57-F047E9CA99BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B892F6C9-03BC-4DF6-8D57-F047E9CA99BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B892F6C9-03BC-4DF6-8D57-F047E9CA99BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08B7A5E3-4DC9-4679-96C9-03E2F471B860}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08B7A5E3-4DC9-4679-96C9-03E2F471B860}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08B7A5E3-4DC9-4679-96C9-03E2F471B860}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08B7A5E3-4DC9-4679-96C9-03E2F471B860}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
