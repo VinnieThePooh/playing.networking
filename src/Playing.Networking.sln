@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageRetranslation.Shared",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetranslationServer", "RetranslationServer\RetranslationServer.csproj", "{08B7A5E3-4DC9-4679-96C9-03E2F471B860}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetranslationReceiver", "RetranslationReceiver\RetranslationReceiver.csproj", "{2C88C02D-59DB-4BA7-AF05-C9252012600E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,7 @@ Global
 		{1937B12D-1AC4-4406-98C3-92568D9B1810} = {8CEA60B7-942E-4C66-B481-84C6D6273FEF}
 		{B892F6C9-03BC-4DF6-8D57-F047E9CA99BD} = {8CEA60B7-942E-4C66-B481-84C6D6273FEF}
 		{08B7A5E3-4DC9-4679-96C9-03E2F471B860} = {8CEA60B7-942E-4C66-B481-84C6D6273FEF}
+		{2C88C02D-59DB-4BA7-AF05-C9252012600E} = {8CEA60B7-942E-4C66-B481-84C6D6273FEF}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{8282BDA6-5625-4B7D-9CB5-67B69A1A18D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -47,5 +50,9 @@ Global
 		{08B7A5E3-4DC9-4679-96C9-03E2F471B860}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08B7A5E3-4DC9-4679-96C9-03E2F471B860}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08B7A5E3-4DC9-4679-96C9-03E2F471B860}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C88C02D-59DB-4BA7-AF05-C9252012600E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C88C02D-59DB-4BA7-AF05-C9252012600E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C88C02D-59DB-4BA7-AF05-C9252012600E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C88C02D-59DB-4BA7-AF05-C9252012600E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

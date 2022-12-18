@@ -57,7 +57,7 @@ public class RetranslationClient
             await stream.WriteAsync(addressBytes);
             await stream.WriteAsync(portBytes);
             await stream.FlushAsync();
-        }).ToArray();
+        });
 
         try
         {

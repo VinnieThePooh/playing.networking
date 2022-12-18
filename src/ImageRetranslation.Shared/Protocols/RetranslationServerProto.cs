@@ -23,6 +23,7 @@ public class RetranslationServerProto : IServerProtocol
 
         // don't do anything here
         // cause of we need to use event-based approach for Receivers
+        // kinda deferred protocol execution
         if (clientType == ClientType.Receiver)
             return;
 
