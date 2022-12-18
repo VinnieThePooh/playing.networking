@@ -43,7 +43,7 @@ public class RetranslationClient
 
     private void OnClientTypeDetected(object? sender, ClientTypeDetectedEventArgs e)
     {
-        Console.WriteLine($"New client type detected: {e.Type} ({EndPoint})");
+        Console.WriteLine($"[{nameof(RetranslationServer)}]: New client type detected: {e.Type} ({EndPoint})");
 
         ClientType = e.Type;
         if (ClientType == ClientType.Receiver)
