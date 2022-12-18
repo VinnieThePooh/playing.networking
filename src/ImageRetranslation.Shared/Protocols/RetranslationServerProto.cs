@@ -1,20 +1,29 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using ImageRetranslationShared.Commands;
+using ImageRetranslationShared.Events;
 
 namespace ImageRetranslationShared.Protocols;
 
 public class RetranslationServerProto : IServerProtocol
 {
+    public EventHandler<ClientTypeDetectedEventArgs> ClientTypeDetected;
+
     public async Task DoCommunication(TcpClient party, CancellationToken token)
     {
-        //todo: two different tasks for different Simplex clients? cause of we only send or only receive
-        //OK, with timeout kinda
-        
-        await using var stream = party.GetStream();
+        var stream = party.GetStream();
         var memory = new byte[1024];
+
+        await stream.ReadExactlyAsync(memory, 0, 1, token);
+        var clientType = (ClientType)memory[0];
+        
+        ClientTypeDetected(this, new ClientTypeDetectedEventArgs(clientType));
+        
         await stream.ReadExactlyAsync(memory, 0, 8, token);
 
         var length = IPAddress.NetworkToHostOrder(BitConverter.ToInt64(memory[..8]));
+        Debug.WriteLine($"Length: {length}");
         int totalRead = 0;
         int bytesRead = 0;
 

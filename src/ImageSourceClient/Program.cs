@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using ImageRetranslationShared.Commands;
 using ImageRetranslationShared.Settings;
 using Microsoft.Extensions.Configuration;
 
@@ -15,7 +16,12 @@ await clientSender.ConnectAsync(IPAddress.Parse(settings.Host), settings.Port);
 
 var networkStream = clientSender.GetStream();
 
-Console.WriteLine("Sending image stream data to server...");
+Console.Write("Sending out client type attribute (ClientType = Sender)...");
+networkStream.WriteByte((byte)ClientType.Sender);
+await networkStream.FlushAsync();
+Console.WriteLine("completed");
+
+Console.Write("Sending image stream data to server...");
 
 await using (var fileStream = File.Open(fileName, FileMode.Open))
 {
