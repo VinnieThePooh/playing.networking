@@ -26,19 +26,18 @@ public class RetranslationServerProto : IServerProtocol
         if (clientType == ClientType.Receiver)
             return;
 
-        await stream.ReadExactlyAsync(memory, 0, 4, token);
+        await stream.ReadExactlyAsync(memory, 0, 8, token);
 
         var length = IPAddress.NetworkToHostOrder(BitConverter.ToInt64(memory[..8]));
         Debug.WriteLine($"Length of image stream: {length}");
         int totalRead = 0;
-        int bytesRead = 0;
 
         var memoryWrapper = new Memory<byte>(memory);
         await using var memoryStream = new MemoryStream();
 
         while (totalRead < length)
         {
-            bytesRead = await party.Client.ReceiveAsync(memoryWrapper, token);
+            var bytesRead = await party.Client.ReceiveAsync(memoryWrapper, token);
 
             if (bytesRead == 0)
             {

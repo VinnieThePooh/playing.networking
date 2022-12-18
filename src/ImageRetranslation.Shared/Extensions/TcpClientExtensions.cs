@@ -10,6 +10,6 @@ public static class TcpClientExtensions
         if (client.Client.RemoteEndPoint is null)
             return null;
 
-        return (IPEndPoint)client.Client.RemoteEndPoint!;
+        return (IPEndPoint)client.Client.RemoteEndPoint;
     }
 }

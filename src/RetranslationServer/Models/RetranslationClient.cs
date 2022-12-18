@@ -37,8 +37,37 @@ public class RetranslationClient
             throw new InvalidOperationException("Client was not initialized");
 
         Protocol.ClientTypeDetected += OnClientTypeDetected;
+        Protocol.ImageUploaded += OnImageUploaded;
 
         return Task.Run(() => Protocol.DoCommunication(Client, token), token);
+    }
+
+    private async void OnImageUploaded(object? sender, ImageUploadedEventArgs e)
+    {
+        var len = IPAddress.HostToNetworkOrder(e.ImageData.Length);
+        var lenBytes = BitConverter.GetBytes(len);
+        var addressBytes = e.Uploader.Address.GetAddressBytes();
+        var portBytes = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)e.Uploader.Port));
+
+        var tasks = receiversDictionary.Values.Select(async receiver =>
+        {
+            var stream = receiver.Client.GetStream();
+            await stream.WriteAsync(lenBytes);
+            await stream.WriteAsync(e.ImageData);
+            await stream.WriteAsync(addressBytes);
+            await stream.WriteAsync(portBytes);
+            await stream.FlushAsync();
+        }).ToArray();
+
+        try
+        {
+            //todo: add TaskExt.WhenAll - this one catch only first exception
+            await Task.WhenAll(tasks);
+        }
+        catch (AggregateException exception)
+        {
+            Console.WriteLine(exception);
+        }
     }
 
     private void OnClientTypeDetected(object? sender, ClientTypeDetectedEventArgs e)
