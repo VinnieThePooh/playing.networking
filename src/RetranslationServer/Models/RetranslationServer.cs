@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using ImageRetranslationShared.Extensions;
 using ImageRetranslationShared.Protocols;
 using ImageRetranslationShared.Protocols.Factories;
 using ImageRetranslationShared.Settings;
@@ -36,7 +37,7 @@ public class RetranslationServer : IRetranslationServer
         {
             var client = await listener.AcceptTcpClientAsync(_cts.Token);
             var proto = (RetranslationServerProto)protoFactory.CreateServerProtocol();
-            var clientWrapper = new RetranslationClient((IPEndPoint)client.Client.RemoteEndPoint!, proto, ReceiversDictionary);
+            var clientWrapper = new RetranslationClient(client.GetRemoteEndpoint()!, proto, ReceiversDictionary);
             clientWrapper.SetClient(client);
             //fire and forget
             clientWrapper.DoCommunication(_cts.Token);
