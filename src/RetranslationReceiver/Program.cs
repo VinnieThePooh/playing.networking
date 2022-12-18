@@ -18,7 +18,7 @@ using var clientSender = new TcpClient();
 
 Console.Write("Connecting to host...");
 await clientSender.ConnectAsync(IPAddress.Parse(settings.Host), settings.Port, cts.Token);
-Console.Write("connected");
+Console.WriteLine("connected");
 
 var netStream = clientSender.GetStream();
 
@@ -27,7 +27,7 @@ netStream.WriteByte((byte)ClientType.Receiver);
 await netStream.FlushAsync(cts.Token);
 Console.WriteLine("completed");
 
-Console.Write("Awaiting for image data...");
+Console.WriteLine("Awaiting for image data...");
 await AwaitImageData(netStream, cts.Token);
 
 async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
