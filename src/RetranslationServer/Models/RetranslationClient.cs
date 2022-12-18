@@ -47,7 +47,7 @@ public class RetranslationClient
         var len = IPAddress.HostToNetworkOrder(e.ImageData.Length);
         var lenBytes = BitConverter.GetBytes(len);
         var addressBytes = e.Uploader.Address.GetAddressBytes();
-        var portBytes = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)e.Uploader.Port));
+        var portBytes = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(e.Uploader.Port));
 
         var tasks = receiversDictionary.Values.Select(async receiver =>
         {

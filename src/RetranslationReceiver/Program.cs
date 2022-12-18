@@ -40,6 +40,9 @@ async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
         var len = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(memory[..4].Span));
 
         int totalRead = 0;
+        int leftToRead = len;
+        int toWrite = 0;
+
         var memoryStream = new MemoryStream();
 
         while (totalRead < len)
@@ -54,15 +57,36 @@ async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
                 return;
             }
 
-            await memoryStream.WriteAsync(memory[..read]);
+            toWrite = Math.Min(read, leftToRead);
+            await memoryStream.WriteAsync(memory[..toWrite], token);
             totalRead += read;
+            leftToRead -= read;
         }
+
+        Memory<byte> hostData;
+
+        //todo: ??
+        if (totalRead >= len + 8)
+            hostData = memory[toWrite..(toWrite + 8)];
+        else
+        {
+            netStream.ReadExactly(memory[toWrite..(toWrite + (len + 8 - totalRead))].Span);
+            hostData = memory[toWrite..(toWrite + 8)];
+        }
+
+        var senderIp = new IPAddress(hostData[..4].Span);
+
+        //??
+        var portBytes = hostData[4..8].ToArray();
+        var senderPort = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(portBytes));
+        var sender = new IPEndPoint(senderIp, senderPort);
 
         var filename = $"{Path.GetRandomFileName()}.jpg";
         await using (var fs = File.Create($"{filename}"))
             await memoryStream.CopyToAsync(fs);
         await memoryStream.DisposeAsync();
 
+        Console.WriteLine($"Received total: {4 + len + 6} bytes form sender {sender}");
         Console.WriteLine($"Created file '{filename}' with image data.");
     }
 }
