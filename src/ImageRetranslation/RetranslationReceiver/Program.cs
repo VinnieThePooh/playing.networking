@@ -9,6 +9,9 @@ var settings = config.GetSection(ImageRetranslationSettings.SectionName).Get<Ima
 
 const string ImageFolder = "images";
 
+if (!Directory.Exists(ImageFolder))
+    Directory.CreateDirectory(ImageFolder);
+
 Console.WriteLine($"Retranslation host: {settings}");
 var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (sender, eventArgs) =>
