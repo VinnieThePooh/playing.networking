@@ -42,7 +42,7 @@ public class RetranslationServerProto : IServerProtocol
 
             if (bytesRead == 0)
             {
-                Console.WriteLine($"[RetranslationServer]: Client {party.GetRemoteEndpoint()} got disconnected prematurely");
+                Console.WriteLine($"[RetranslationServer]: Client {party.GetRemoteEndpoint()} disconnected prematurely");
                 party.Close();
 
                 return;

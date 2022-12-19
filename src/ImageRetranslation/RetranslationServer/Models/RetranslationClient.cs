@@ -63,6 +63,7 @@ public class RetranslationClient
         {
             //todo: add TaskExt.WhenAll - this one catch only first exception
             await Task.WhenAll(tasks);
+            Protocol.ImageUploaded -= OnImageUploaded;
         }
         catch (AggregateException exception)
         {
