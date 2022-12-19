@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using ImageRetranslationShared.Commands;
 using ImageRetranslationShared.Events;
+using ImageRetranslationShared.Extensions;
 using ImageRetranslationShared.Protocols;
 
 namespace RetranslationServer.Models;
@@ -61,8 +62,7 @@ public class RetranslationClient
 
         try
         {
-            //todo: add TaskExt.WhenAll - this one catch only first exception
-            await Task.WhenAll(tasks);
+            await tasks.WhenAll();
             Protocol.ImageUploaded -= OnImageUploaded;
         }
         catch (AggregateException exception)
