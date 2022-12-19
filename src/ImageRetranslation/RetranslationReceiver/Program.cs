@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 var settings = config.GetSection(ImageRetranslationSettings.SectionName).Get<ImageRetranslationSettings>();
 
+const string ImageFolder = "images";
+
 Console.WriteLine($"Retranslation host: {settings}");
 var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (sender, eventArgs) =>
@@ -83,7 +85,7 @@ async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
 
         var filename = $"{Path.GetRandomFileName()}.jpg";
 
-        await using (var fs = File.Create($"{filename}"))
+        await using (var fs = File.Create(Path.Combine(ImageFolder, filename)))
         {
             memoryStream.Seek(0, SeekOrigin.Begin);
             memoryStream.CopyTo(fs);
