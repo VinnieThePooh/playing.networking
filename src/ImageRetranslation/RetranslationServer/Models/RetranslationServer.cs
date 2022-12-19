@@ -40,7 +40,7 @@ public class RetranslationServer : IRetranslationServer
             var clientWrapper = new RetranslationClient(client.GetRemoteEndpoint()!, proto, ReceiversDictionary);
             clientWrapper.SetClient(client);
             //fire and forget
-            clientWrapper.DoCommunication(_cts.Token);
+            _ = clientWrapper.DoCommunication(_cts.Token);
         }
 
         return true;

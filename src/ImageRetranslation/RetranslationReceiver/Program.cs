@@ -82,11 +82,15 @@ async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
         var sender = new IPEndPoint(senderIp, senderPort);
 
         var filename = $"{Path.GetRandomFileName()}.jpg";
-        await using (var fs = File.Create($"{filename}"))
-            await memoryStream.CopyToAsync(fs);
-        await memoryStream.DisposeAsync();
 
-        Console.WriteLine($"Received total: {4 + len + 6} bytes form sender {sender}");
+        await using (var fs = File.Create($"{filename}"))
+        {
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            memoryStream.CopyTo(fs);
+            await memoryStream.DisposeAsync();
+        }
+
+        Console.WriteLine($"Received total: {totalRead + 4} bytes form sender {sender}");
         Console.WriteLine($"Created file '{filename}' with image data.");
     }
 }
