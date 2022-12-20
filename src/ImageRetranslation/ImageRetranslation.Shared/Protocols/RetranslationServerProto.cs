@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Net;
 using System.Net.Sockets;
 using ImageRetranslationShared.Commands;
 using ImageRetranslationShared.Events;
@@ -27,32 +26,51 @@ public class RetranslationServerProto : IServerProtocol
         if (clientType == ClientType.Receiver)
             return;
 
-        await stream.ReadExactlyAsync(memory, 0, 8, token);
+        var numberOfFiles = await stream.ReadInt(memory, token);
+        var memoryWrapper = new Memory<byte>(memory);
+        for (int i = 0; i < numberOfFiles; i++)
+            await ReadFileData(party, memoryWrapper, i + 1, numberOfFiles, token);
 
-        var length = IPAddress.NetworkToHostOrder(BitConverter.ToInt64(memory[..8]));
-        Debug.WriteLine($"Length of image stream: {length}");
+        party.Close();
+    }
+
+    private async Task ReadFileData(TcpClient party, Memory<byte> memory, int orderNumber, int batchSize, CancellationToken token)
+    {
+        var stream = party.GetStream();
+        var nameLength = await stream.ReadInt(memory, token);
+        await stream.ReadExactlyAsync(memory[..nameLength], token);
+        var nameBytes = memory[..nameLength].ToArray();
+
+        var dataLength = await stream.ReadLong(memory, token);
+
+        Debug.WriteLine($"Length of image stream: {dataLength}");
         int totalRead = 0;
 
-        var memoryWrapper = new Memory<byte>(memory);
         await using var memoryStream = new MemoryStream();
 
-        while (totalRead < length)
+        while (totalRead < dataLength)
         {
-            var bytesRead = await party.Client.ReceiveAsync(memoryWrapper, token);
+            var bytesRead = await stream.ReadAsync(memory, token);
 
             if (bytesRead == 0)
             {
                 Console.WriteLine($"[RetranslationServer]: Client {party.GetRemoteEndpoint()} disconnected prematurely");
-                party.Close();
-
+                stream.Close();
                 return;
             }
 
-            memoryStream.Write(memoryWrapper[..bytesRead].Span);
+            memoryStream.Write(memory[..bytesRead].Span);
             totalRead += bytesRead;
         }
 
-        ImageUploaded?.Invoke(this, new ImageUploadedEventArgs(party.GetRemoteEndpoint()!, memoryStream.ToArray()));
-        party.Close();
+        ImageUploaded?.Invoke(this,
+            new ImageUploadedEventArgs
+            {
+                ImageData = memoryStream.ToArray(),
+                ImageNameData = nameBytes,
+                Uploader = party.GetRemoteEndpoint()!,
+                EventOrderNumber = orderNumber,
+                BatchSize = batchSize
+            });
     }
 }

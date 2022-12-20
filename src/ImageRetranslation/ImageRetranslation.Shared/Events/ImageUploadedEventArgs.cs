@@ -4,13 +4,15 @@ namespace ImageRetranslationShared.Events;
 
 public class ImageUploadedEventArgs
 {
-    public ImageUploadedEventArgs(IPEndPoint uploader, byte[] imageData)
-    {
-        Uploader = uploader;
-        ImageData = imageData;
-    }
+    public IPEndPoint Uploader { get; init; }
 
-    public IPEndPoint Uploader { get; }
+    public byte[] ImageData { get; init; }
 
-    public byte[] ImageData { get; }
+    public byte[] ImageNameData { get; init; }
+
+    //total count of sequential images came from receiver
+    public int BatchSize { get; init; }
+
+    //event order number within the batch of images
+    public int EventOrderNumber { get; init; }
 }

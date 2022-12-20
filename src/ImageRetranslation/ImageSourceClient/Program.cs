@@ -9,7 +9,7 @@ Console.WriteLine($"Retranslation host: {settings}");
 
 var cts = new CancellationTokenSource();
 
-string[] images = new string[] { };
+string[] images = { };
 IImageSender sender = new ImageSender(settings);
 await sender.SendImages(images, cts.Token);
 
