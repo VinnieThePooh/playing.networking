@@ -3,7 +3,7 @@ using System.Net.Sockets;
 
 namespace ImageRetranslationShared.Extensions;
 
-public static class TcpClientExtensions
+public static class NetworkExtensions
 {
     public static IPEndPoint? GetRemoteEndpoint(this TcpClient client)
     {
@@ -12,4 +12,10 @@ public static class TcpClientExtensions
 
         return (IPEndPoint)client.Client.RemoteEndPoint;
     }
+
+    public static byte[] ToNetworkBytes(this int integer) =>
+        BitConverter.GetBytes(IPAddress.HostToNetworkOrder(integer));
+
+    public static byte[] ToNetworkBytes(this long integer) =>
+        BitConverter.GetBytes(IPAddress.HostToNetworkOrder(integer));
 }

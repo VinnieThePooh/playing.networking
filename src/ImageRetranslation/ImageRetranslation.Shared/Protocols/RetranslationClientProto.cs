@@ -2,10 +2,7 @@ using System.Net.Sockets;
 
 namespace ImageRetranslationShared.Protocols;
 
-public class RetranslationClientProto : IClientProtocol
+public abstract class RetranslationClientProto : IClientProtocol
 {
-    public Task DoCommunication(TcpClient party, CancellationToken token)
-    {
-        throw new NotImplementedException();
-    }
+    public abstract Task DoCommunication(TcpClient party, CancellationToken token);
 }
