@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using ImageRetranslationShared.Commands;
+using ImageRetranslationShared.Extensions;
 using ImageRetranslationShared.Settings;
 using Microsoft.Extensions.Configuration;
 
@@ -35,22 +37,27 @@ Console.WriteLine("completed");
 Console.WriteLine("Awaiting for image data...");
 await AwaitImageData(netStream, cts.Token);
 
+//todo: refactor
 async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
 {
     var memory = new Memory<byte>(new byte[1024]);
 
     while (!token.IsCancellationRequested)
     {
-        netStream.ReadExactly(memory[..4].Span);
-        var len = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(memory[..4].Span));
+        var nameLength = await netStream.ReadInt(memory, token);
+
+        var nameData = memory[..nameLength];
+        await netStream.ReadExactlyAsync(nameData);
+        var fileName = Encoding.UTF8.GetString(nameData.Span);
+        var dataLength = await netStream.ReadInt(memory, token);
 
         int totalRead = 0;
-        int leftToRead = len;
+        int leftToRead = dataLength;
         int toWrite = 0;
 
         var memoryStream = new MemoryStream();
 
-        while (totalRead < len)
+        while (totalRead < dataLength)
         {
             var read = await netStream.ReadAsync(memory, token);
 
@@ -71,11 +78,11 @@ async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
         Memory<byte> hostData;
 
         //todo: ??
-        if (totalRead >= len + 8)
+        if (totalRead >= nameLength + 8)
             hostData = memory[toWrite..(toWrite + 8)];
         else
         {
-            netStream.ReadExactly(memory[toWrite..(toWrite + (len + 8 - totalRead))].Span);
+            netStream.ReadExactly(memory[toWrite..(toWrite + (nameLength + 8 - totalRead))].Span);
             hostData = memory[toWrite..(toWrite + 8)];
         }
 
@@ -86,9 +93,8 @@ async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
         var senderPort = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(portBytes));
         var sender = new IPEndPoint(senderIp, senderPort);
 
-        var filename = $"{Path.GetRandomFileName()}.jpg";
-
-        await using (var fs = File.Create(Path.Combine(ImageFolder, filename)))
+        //todo: check for existing file names
+        await using (var fs = File.Create(Path.Combine(ImageFolder, fileName)))
         {
             memoryStream.Seek(0, SeekOrigin.Begin);
             memoryStream.CopyTo(fs);
@@ -96,7 +102,7 @@ async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
         }
 
         Console.WriteLine($"Received total: {totalRead + 4} bytes form sender {sender}");
-        Console.WriteLine($"Created file '{filename}' with image data.");
+        Console.WriteLine($"Created file '{fileName}' with image data.");
     }
 }
 
