@@ -6,7 +6,7 @@ using ImageRetranslationShared.Events;
 using ImageRetranslationShared.Extensions;
 using ImageRetranslationShared.Protocols;
 
-namespace RetranslationServer.Models;
+namespace Retranslation;
 
 public class ClientProxy
 {

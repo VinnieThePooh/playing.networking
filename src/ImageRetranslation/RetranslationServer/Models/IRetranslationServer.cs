@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net;
 
-namespace RetranslationServer.Models;
+namespace Retranslation;
 
 public interface IRetranslationServer
 {

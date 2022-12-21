@@ -6,13 +6,11 @@ using ImageRetranslationShared.Protocols;
 using ImageRetranslationShared.Protocols.Factories;
 using ImageRetranslationShared.Settings;
 
-namespace RetranslationServer.Models;
+namespace Retranslation;
 
 public class RetranslationServer : IRetranslationServer
 {
     private CancellationTokenSource _cts;
-
-    // public EventHandler<>
     public ImageRetranslationSettings Settings { get; }
 
     public RetranslationServer(ImageRetranslationSettings settings)
