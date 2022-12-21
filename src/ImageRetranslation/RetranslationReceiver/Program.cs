@@ -6,6 +6,7 @@ using ImageRetranslationShared.Commands;
 using ImageRetranslationShared.Extensions;
 using ImageRetranslationShared.Settings;
 using Microsoft.Extensions.Configuration;
+using RetranslationReceiver.Models;
 
 var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 var settings = config.GetSection(ImageRetranslationSettings.SectionName).Get<ImageRetranslationSettings>();
@@ -39,7 +40,12 @@ Console.WriteLine("Awaiting for image data...");
 
 try
 {
-    await AwaitImageData(netStream, cts.Token);
+    await foreach (var file in AwaitImageData(netStream, cts.Token))
+    {
+        //todo: check for existing file names
+        await using var fs = File.Create(Path.Combine(ImageFolder, file.FileName));
+        Console.WriteLine($"Created file '{file.FileName}' with image data.");
+    }
 }
 catch (Exception e)
 {
@@ -49,7 +55,7 @@ catch (Exception e)
 Console.ReadLine();
 
 //todo: refactor
-async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
+async IAsyncEnumerable<NetworkFile> AwaitImageData(NetworkStream netStream, CancellationToken token)
 {
     var memory = new Memory<byte>(new byte[1024]);
 
@@ -67,63 +73,58 @@ async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
 
         int totalRead = 0;
         int leftToRead = dataLength;
+        int read = 0;
         int toWrite = 0;
         int iterCounter = 0;
 
-        var memoryStream = new MemoryStream();
+        using var memoryStream = new MemoryStream();
 
         while (totalRead < dataLength)
         {
-            var read = await netStream.ReadAsync(memory, token);
+            read = await netStream.ReadAsync(memory, token);
             Debug.IndentLevel = 2;
-            Debug.WriteLine($"{++iterCounter}.Has read: {read} bytes");
 
             if (read == 0)
             {
                 Console.WriteLine("Server disconnected prematurely");
                 netStream.Close();
-
-                return;
+                yield break;
             }
 
             toWrite = Math.Min(read, leftToRead);
             await memoryStream.WriteAsync(memory[..toWrite], token);
+
+            Debug.WriteLine($"{++iterCounter}.Read - {read}; Write - {toWrite} bytes");
+
+            if (read > toWrite)
+                Debugger.Break();
+
             totalRead += read;
             leftToRead -= read;
         }
 
-        // what would be if sender and receiver app buffers are of different size?
-        netStream.ReadExactly(memory[..8].Span);
+        Memory<byte> hostData;
 
-        //todo: ??
-        // if (totalRead >= dataLength + 8)
-        //     hostData = memory[toWrite..(toWrite + 8)];
-        // else
-        // {
-        //     netStream.ReadExactly(memory[toWrite..(toWrite + dataLength + 8 - totalRead)].Span);
-        //     hostData = memory[toWrite..(toWrite + 8)];
-        // }
+        if (toWrite < read)
+            hostData = memory[toWrite..(toWrite + 8)];
+        else
+        {
+            hostData = memory[..8];
+            await netStream.ReadExactlyAsync(hostData);
+        }
 
-        var senderIp = new IPAddress(memory[..4].Span);
-        var portBytes = memory[4..8].ToArray();
+        var senderIp = new IPAddress(hostData[..4].Span);
+        var portBytes = hostData[4..8].ToArray();
         var senderPort = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(portBytes));
 
         Debug.WriteLine($"IPAddress: {senderIp}");
-        Debug.WriteLine($"Port: {senderIp}");
+        Debug.WriteLine($"Port: {senderPort}");
         Debug.WriteLine($"Network port bytes: {string.Join(' ', portBytes)}");
 
         var sender = new IPEndPoint(senderIp, senderPort);
-
-        //todo: check for existing file names
-        await using (var fs = File.Create(Path.Combine(ImageFolder, fileName)))
-        {
-            memoryStream.Seek(0, SeekOrigin.Begin);
-            memoryStream.CopyTo(fs);
-            await memoryStream.DisposeAsync();
-        }
+        yield return new NetworkFile(fileName, memoryStream.ToArray(), sender);
 
         Console.WriteLine($"Received total: {totalRead + 4} bytes form sender {sender}");
-        Console.WriteLine($"Created file '{fileName}' with image data.");
     }
 }
 

@@ -9,7 +9,9 @@ Console.WriteLine($"Retranslation host: {settings}");
 
 var cts = new CancellationTokenSource();
 
-string[] images = Directory.EnumerateFiles("Images").OrderBy(x => Random.Shared.Next()).ToArray();
+string[] images = Directory.EnumerateFiles("Images")
+    // .Where(x => !Path.GetFileName(x).Equals("lost a ball.jpg"))
+    .OrderBy(x => Random.Shared.Next()).ToArray();
 
 Console.Write($"Sending {images.Length} to Retranslation host...");
 IImageSender sender = new ImageSender(settings);
