@@ -44,7 +44,8 @@ try
     {
         //todo: check for existing file names
         await using var fs = File.Create(Path.Combine(ImageFolder, file.FileName));
-        Console.WriteLine($"Created file '{file.FileName}' with image data.");
+        await fs.WriteAsync(file.Data, cts.Token);
+        Console.WriteLine($"Created file '{file.FileName}' with image data. (Origin: {file.Origin})");
     }
 }
 catch (Exception e)
