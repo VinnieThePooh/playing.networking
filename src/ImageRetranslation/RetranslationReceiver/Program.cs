@@ -59,28 +59,35 @@ Console.ReadLine();
 async IAsyncEnumerable<NetworkFile> AwaitImageData(NetworkStream netStream, CancellationToken token)
 {
     var memory = new Memory<byte>(new byte[1024]);
+    int leftDataOffset = 0;
+    bool newMessage = false;
 
     while (!token.IsCancellationRequested)
     {
-        var nameLength = await netStream.ReadInt(memory, token);
+        FileIterInfo fileIterInfo;
+        using MemoryStream memoryStream = new();
 
-        var nameData = memory[..nameLength];
-        await netStream.ReadExactlyAsync(nameData);
-        var fileName = Encoding.UTF8.GetString(nameData.Span);
-        var dataLength = await netStream.ReadInt(memory, token);
+        try
+        {
+            Debug.WriteLine($"Left data offset: {leftDataOffset}");
+            fileIterInfo = await GetFileAndIterationInfo(!newMessage ? memory : memory[leftDataOffset..], netStream, memoryStream, token, newMessage);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
 
-        Debug.WriteLine($"Filename: {fileName} ({nameLength} bytes)");
-        Debug.WriteLine($"Data length: {dataLength}");
+        Debug.WriteLine($"Filename: {fileIterInfo.FileName} ({fileIterInfo.NameLength} bytes)");
+        Debug.WriteLine($"Data length: {fileIterInfo.DataLength}");
 
-        int totalRead = 0;
-        int leftToRead = dataLength;
+        int totalRead = fileIterInfo.TotalRead;
+        int leftToRead = fileIterInfo.LeftToRead;
         int read = 0;
         int toWrite = 0;
-        int iterCounter = 0;
+        var iterCounter = 0;
 
-        using var memoryStream = new MemoryStream();
-
-        while (totalRead < dataLength)
+        while (totalRead < fileIterInfo.DataLength)
         {
             read = await netStream.ReadAsync(memory, token);
             Debug.IndentLevel = 2;
@@ -97,9 +104,6 @@ async IAsyncEnumerable<NetworkFile> AwaitImageData(NetworkStream netStream, Canc
 
             Debug.WriteLine($"{++iterCounter}.Read - {read}; Write - {toWrite} bytes");
 
-            if (read > toWrite)
-                Debugger.Break();
-
             totalRead += read;
             leftToRead -= read;
         }
@@ -107,11 +111,16 @@ async IAsyncEnumerable<NetworkFile> AwaitImageData(NetworkStream netStream, Canc
         Memory<byte> hostData;
 
         if (toWrite < read)
-            hostData = memory[toWrite..(toWrite + 8)];
+        {
+            leftDataOffset = toWrite + 8;
+            hostData = memory[toWrite..leftDataOffset];
+            newMessage = true;
+        }
         else
         {
             hostData = memory[..8];
             await netStream.ReadExactlyAsync(hostData);
+            newMessage = false;
         }
 
         var senderIp = new IPAddress(hostData[..4].Span);
@@ -123,9 +132,66 @@ async IAsyncEnumerable<NetworkFile> AwaitImageData(NetworkStream netStream, Canc
         Debug.WriteLine($"Network port bytes: {string.Join(' ', portBytes)}");
 
         var sender = new IPEndPoint(senderIp, senderPort);
-        yield return new NetworkFile(fileName, memoryStream.ToArray(), sender);
+        yield return new NetworkFile(fileIterInfo.FileName, memoryStream.ToArray(), sender);
 
         Console.WriteLine($"Received total: {totalRead + 4} bytes form sender {sender}");
     }
+}
+
+static async ValueTask<FileIterInfo> GetFileAndIterationInfo(Memory<byte> memory, NetworkStream nStream, MemoryStream mStream, CancellationToken token, bool newMessage = false)
+{
+    int nameLength;
+    string fileName;
+    int dataLength;
+
+    if (!newMessage)
+    {
+        nameLength = await nStream.ReadInt(memory, token);
+        var nameData = memory[..nameLength];
+        await nStream.ReadExactlyAsync(nameData);
+        fileName = Encoding.UTF8.GetString(nameData.Span);
+        dataLength = await nStream.ReadInt(memory, token);
+
+        return new FileIterInfo
+        {
+            DataLength = dataLength,
+            FileName = fileName,
+            NameLength = nameLength,
+            LeftToRead = dataLength
+        };
+    }
+
+    //assume newly arrived message data length is always > (4 + nameLength + 4)
+    //control via buffer size?
+
+    nameLength = memory.Span.GetHostOrderInt();
+    fileName = Encoding.UTF8.GetString(memory[4..(nameLength + 4)].Span);
+    dataLength = memory[(nameLength + 4)..].Span.GetHostOrderInt();
+
+    var leftData = memory[(nameLength + 8)..];
+
+    if (!leftData.IsEmpty)
+        await mStream.WriteAsync(leftData, token);
+
+    return new FileIterInfo
+    {
+        FileName = fileName,
+        NameLength = nameLength,
+        DataLength = dataLength,
+        TotalRead = leftData.Length,
+        LeftToRead = dataLength - leftData.Length
+    };
+}
+
+struct FileIterInfo
+{
+    public string FileName { get; set; }
+
+    public int NameLength { get; set; }
+    public int DataLength { get; set; }
+
+    public int LeftToRead { get; set; }
+
+    public int TotalRead { get; set; }
 }
 
