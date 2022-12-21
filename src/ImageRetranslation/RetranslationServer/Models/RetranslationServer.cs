@@ -35,10 +35,10 @@ public class RetranslationServer : IRetranslationServer
         {
             var client = await listener.AcceptTcpClientAsync(_cts.Token);
             var proto = (RetranslationServerProto)protoFactory.CreateServerProtocol();
-            var clientWrapper = new ClientProxy(client.GetRemoteEndpoint()!, proto, ReceiversDictionary);
-            clientWrapper.SetClient(client);
+            var clientProxy = new ClientProxy(client.GetRemoteEndpoint()!, proto, ReceiversDictionary);
+            clientProxy.SetClient(client);
             //fire and forget
-            _ = clientWrapper.DoCommunication(_cts.Token);
+            _ = clientProxy.DoCommunication(_cts.Token);
         }
 
         return true;

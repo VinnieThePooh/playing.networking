@@ -70,10 +70,12 @@ async IAsyncEnumerable<NetworkFile> AwaitImageData(NetworkStream netStream, Canc
         try
         {
             Debug.WriteLine($"Left data offset: {leftDataOffset}");
-            fileIterInfo = await GetFileAndIterationInfo(!newMessage ? memory : memory[leftDataOffset..], netStream, memoryStream, token, newMessage);
+            fileIterInfo = await GetFileAndIterationInfo(leftDataOffset, !newMessage ? memory : memory[leftDataOffset..], netStream, memoryStream, token, newMessage);
         }
         catch (Exception e)
         {
+            Console.WriteLine("Exception:");
+            Console.WriteLine($"memory.Length: {memory.Length}; Offset value: {leftDataOffset}");
             Console.WriteLine(e);
             throw;
         }
@@ -138,7 +140,7 @@ async IAsyncEnumerable<NetworkFile> AwaitImageData(NetworkStream netStream, Canc
     }
 }
 
-static async ValueTask<FileIterInfo> GetFileAndIterationInfo(Memory<byte> memory, NetworkStream nStream, MemoryStream mStream, CancellationToken token, bool newMessage = false)
+static async ValueTask<FileIterInfo> GetFileAndIterationInfo(int offsetVal, Memory<byte> memory, NetworkStream nStream, MemoryStream mStream, CancellationToken token, bool newMessage = false)
 {
     int nameLength;
     string fileName;
@@ -164,7 +166,11 @@ static async ValueTask<FileIterInfo> GetFileAndIterationInfo(Memory<byte> memory
     //assume newly arrived message data length is always > (4 + nameLength + 4)
     //control via buffer size?
 
+    Console.WriteLine($"[GetFileAndIterationInfo]: Left data offset:: {offsetVal}");
+    Console.WriteLine($"[GetFileAndIterationInfo]: memory.Length: {memory.Length}");
     nameLength = memory.Span.GetHostOrderInt();
+    Console.WriteLine($"[GetFileAndIterationInfo]: nameLength value: {nameLength}");
+
     fileName = Encoding.UTF8.GetString(memory[4..(nameLength + 4)].Span);
     dataLength = memory[(nameLength + 4)..].Span.GetHostOrderInt();
 

@@ -17,3 +17,4 @@ Console.Write($"Sending {images.Length} to Retranslation host...");
 IImageSender sender = new ImageSender(settings);
 await sender.SendImages(images, cts.Token);
 Console.WriteLine($"completed");
+Console.ReadLine();
