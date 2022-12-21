@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using ImageRetranslationShared.Commands;
@@ -35,7 +36,17 @@ await netStream.FlushAsync(cts.Token);
 Console.WriteLine("completed");
 
 Console.WriteLine("Awaiting for image data...");
-await AwaitImageData(netStream, cts.Token);
+
+try
+{
+    await AwaitImageData(netStream, cts.Token);
+}
+catch (Exception e)
+{
+    Console.WriteLine(e);
+}
+
+Console.ReadLine();
 
 //todo: refactor
 async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
@@ -51,15 +62,21 @@ async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
         var fileName = Encoding.UTF8.GetString(nameData.Span);
         var dataLength = await netStream.ReadInt(memory, token);
 
+        Debug.WriteLine($"Filename: {fileName} ({nameLength} bytes)");
+        Debug.WriteLine($"Data length: {dataLength}");
+
         int totalRead = 0;
         int leftToRead = dataLength;
         int toWrite = 0;
+        int iterCounter = 0;
 
         var memoryStream = new MemoryStream();
 
         while (totalRead < dataLength)
         {
             var read = await netStream.ReadAsync(memory, token);
+            Debug.IndentLevel = 2;
+            Debug.WriteLine($"{++iterCounter}.Has read: {read} bytes");
 
             if (read == 0)
             {
@@ -75,22 +92,26 @@ async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
             leftToRead -= read;
         }
 
-        Memory<byte> hostData;
+        // what would be if sender and receiver app buffers are of different size?
+        netStream.ReadExactly(memory[..8].Span);
 
         //todo: ??
-        if (totalRead >= nameLength + 8)
-            hostData = memory[toWrite..(toWrite + 8)];
-        else
-        {
-            netStream.ReadExactly(memory[toWrite..(toWrite + (nameLength + 8 - totalRead))].Span);
-            hostData = memory[toWrite..(toWrite + 8)];
-        }
+        // if (totalRead >= dataLength + 8)
+        //     hostData = memory[toWrite..(toWrite + 8)];
+        // else
+        // {
+        //     netStream.ReadExactly(memory[toWrite..(toWrite + dataLength + 8 - totalRead)].Span);
+        //     hostData = memory[toWrite..(toWrite + 8)];
+        // }
 
-        var senderIp = new IPAddress(hostData[..4].Span);
-
-        //??
-        var portBytes = hostData[4..8].ToArray();
+        var senderIp = new IPAddress(memory[..4].Span);
+        var portBytes = memory[4..8].ToArray();
         var senderPort = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(portBytes));
+
+        Debug.WriteLine($"IPAddress: {senderIp}");
+        Debug.WriteLine($"Port: {senderIp}");
+        Debug.WriteLine($"Network port bytes: {string.Join(' ', portBytes)}");
+
         var sender = new IPEndPoint(senderIp, senderPort);
 
         //todo: check for existing file names
@@ -105,5 +126,4 @@ async Task AwaitImageData(NetworkStream netStream, CancellationToken token)
         Console.WriteLine($"Created file '{fileName}' with image data.");
     }
 }
-
 

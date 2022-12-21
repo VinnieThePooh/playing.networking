@@ -44,7 +44,7 @@ public class ImageSender : IImageSender, IAsyncDisposable
 
         networkStream.Write(fname.Length.ToNetworkBytes());
         networkStream.Write(Encoding.UTF8.GetBytes(fname));
-        networkStream.Write((fs.Length).ToNetworkBytes());
+        networkStream.Write(fs.Length.ToNetworkBytes());
         await fs.CopyToAsync(networkStream, token);
     }
 
