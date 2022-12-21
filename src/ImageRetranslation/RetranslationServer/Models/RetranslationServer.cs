@@ -37,7 +37,7 @@ public class RetranslationServer : IRetranslationServer
         {
             var client = await listener.AcceptTcpClientAsync(_cts.Token);
             var proto = (RetranslationServerProto)protoFactory.CreateServerProtocol();
-            var clientWrapper = new RetranslationClient(client.GetRemoteEndpoint()!, proto, ReceiversDictionary);
+            var clientWrapper = new ClientProxy(client.GetRemoteEndpoint()!, proto, ReceiversDictionary);
             clientWrapper.SetClient(client);
             //fire and forget
             _ = clientWrapper.DoCommunication(_cts.Token);
@@ -58,5 +58,5 @@ public class RetranslationServer : IRetranslationServer
         return Task.FromResult(true);
     }
 
-    public ConcurrentDictionary<IPEndPoint, RetranslationClient> ReceiversDictionary { get; } = new();
+    public ConcurrentDictionary<IPEndPoint, ClientProxy> ReceiversDictionary { get; } = new();
 }

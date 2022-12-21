@@ -8,11 +8,11 @@ using ImageRetranslationShared.Protocols;
 
 namespace RetranslationServer.Models;
 
-public class RetranslationClient
+public class ClientProxy
 {
-    private readonly ConcurrentDictionary<IPEndPoint, RetranslationClient> receiversDictionary;
+    private readonly ConcurrentDictionary<IPEndPoint, ClientProxy> receiversDictionary;
 
-    public RetranslationClient(IPEndPoint endPoint, RetranslationServerProto protocol, ConcurrentDictionary<IPEndPoint, RetranslationClient> receiversDictionary)
+    public ClientProxy(IPEndPoint endPoint, RetranslationServerProto protocol, ConcurrentDictionary<IPEndPoint, ClientProxy> receiversDictionary)
     {
         this.receiversDictionary = receiversDictionary;
         EndPoint = endPoint;
