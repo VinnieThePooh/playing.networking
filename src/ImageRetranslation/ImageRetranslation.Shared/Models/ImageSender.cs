@@ -26,9 +26,10 @@ public class ImageSender : IImageSender, IAsyncDisposable
 
         Console.Write("Sending client type attribute (ClientType = Sender) and number of files to be passed...");
         networkStream.WriteByte((byte)ClientType.Sender);
+        Console.WriteLine("completed");
+
         networkStream.Write(images.Length.ToNetworkBytes());
         await networkStream.FlushAsync(token);
-        Console.WriteLine("completed");
 
         Console.Write("Sending image stream data to server...");
         for (int i = 0; i < images.Length; ++i)
