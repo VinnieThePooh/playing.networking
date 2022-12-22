@@ -1,10 +1,10 @@
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
-using ImageRetranslationShared.Extensions;
-using ImageRetranslationShared.Protocols;
-using ImageRetranslationShared.Protocols.Factories;
-using ImageRetranslationShared.Settings;
+using DataStreaming.Common.Extensions;
+using DataStreaming.Common.Protocols;
+using DataStreaming.Common.Protocols.Factories;
+using DataStreaming.Common.Settings;
 
 namespace Retranslation;
 

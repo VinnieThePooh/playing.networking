@@ -12,7 +12,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetranslationServer", "Imag
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetranslationReceiver", "ImageRetranslation\RetranslationReceiver\RetranslationReceiver.csproj", "{A607317C-29D7-4017-9AA1-7B71DB132FF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageRetranslation.Shared", "ImageRetranslation\ImageRetranslation.Shared\ImageRetranslation.Shared.csproj", "{CBFDE5B8-C5CC-4C9D-B76C-198F5E2BD1C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStreaming.Shared", "ImageRetranslation\DataStreaming.Shared\DataStreaming.Shared.csproj", "{CBFDE5B8-C5CC-4C9D-B76C-198F5E2BD1C5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageSourceClient", "ImageRetranslation\ImageSourceClient\ImageSourceClient.csproj", "{46CC054D-10E0-4F21-AACD-4F5440FAE310}"
 EndProject

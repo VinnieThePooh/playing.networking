@@ -1,4 +1,4 @@
-namespace ImageRetranslationShared.Protocols.Factories;
+namespace DataStreaming.Common.Protocols.Factories;
 
 public class ImageRetranslationProtocolFactory : IProtocolFactory
 {
@@ -6,7 +6,7 @@ public class ImageRetranslationProtocolFactory : IProtocolFactory
     {
     }
 
-    public IClientProtocol CreateClientProtocol() => new RetranslationClientProto();
+    public IClientProtocol CreateClientProtocol() => throw new NotSupportedException("Not supported: Use IFileSender service instead of IClientProtocol");
 
     public IServerProtocol CreateServerProtocol() => new RetranslationServerProto();
 

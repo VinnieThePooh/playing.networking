@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ImageRetranslation.Shared\ImageRetranslation.Shared.csproj" />
+      <ProjectReference Include="..\DataStreaming.Shared\DataStreaming.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

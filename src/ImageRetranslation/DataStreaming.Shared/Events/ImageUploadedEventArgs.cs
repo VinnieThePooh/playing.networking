@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace ImageRetranslationShared.Events;
+namespace DataStreaming.Common.Events;
 
 public class ImageUploadedEventArgs
 {
@@ -13,6 +13,6 @@ public class ImageUploadedEventArgs
     //total count of sequential images came from receiver
     public int BatchSize { get; init; }
 
-    //event order number within the batch of images
-    public int EventOrderNumber { get; init; }
+    //within the batch of images
+    public int MessageOrderNumber { get; init; }
 }

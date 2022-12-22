@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace ImageRetranslationShared.Extensions;
+namespace DataStreaming.Common.Extensions;
 
 public static class NetworkExtensions
 {

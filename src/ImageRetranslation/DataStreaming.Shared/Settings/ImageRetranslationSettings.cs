@@ -1,4 +1,4 @@
-namespace ImageRetranslationShared.Settings;
+namespace DataStreaming.Common.Settings;
 
 public class ImageRetranslationSettings
 {

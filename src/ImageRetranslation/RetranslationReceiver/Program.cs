@@ -2,9 +2,9 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using ImageRetranslationShared.Commands;
-using ImageRetranslationShared.Extensions;
-using ImageRetranslationShared.Settings;
+using DataStreaming.Common.Constants;
+using DataStreaming.Common.Extensions;
+using DataStreaming.Common.Settings;
 using Microsoft.Extensions.Configuration;
 using RetranslationReceiver.Models;
 
@@ -163,8 +163,7 @@ static async ValueTask<FileIterInfo> GetFileAndIterationInfo(int offsetVal, Memo
         };
     }
 
-    //assume newly arrived message data length is always > (4 + nameLength + 4)
-    //control via buffer size?
+    //assume new data is enough to read "preamble"
 
     Console.WriteLine($"[GetFileAndIterationInfo]: Left data offset:: {offsetVal}");
     Console.WriteLine($"[GetFileAndIterationInfo]: memory.Length: {memory.Length}");

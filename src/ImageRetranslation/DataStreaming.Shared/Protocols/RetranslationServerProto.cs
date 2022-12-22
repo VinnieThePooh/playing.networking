@@ -1,11 +1,12 @@
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
-using ImageRetranslationShared.Commands;
-using ImageRetranslationShared.Events;
-using ImageRetranslationShared.Extensions;
+using DataStreaming.Common.Constants;
+using DataStreaming.Common.Events;
+using DataStreaming.Common.Extensions;
+using ImageRetranslationShared.Models;
 
-namespace ImageRetranslationShared.Protocols;
+namespace DataStreaming.Common.Protocols;
 
 public class RetranslationServerProto : IServerProtocol
 {
@@ -28,17 +29,14 @@ public class RetranslationServerProto : IServerProtocol
             return;
 
         var numberOfFiles = await stream.ReadInt(memory, token);
-        Debug.IndentLevel = 2;
-        Debug.WriteLine($"Number of files: {numberOfFiles}");
 
         var memoryWrapper = new Memory<byte>(memory);
 
-        IterInfo iterInfo = new()
+        StreamingInfo iterInfo = new()
         {
             BatchSize = numberOfFiles,
-            EventOrderNumber = 1,
-            Buffer = memoryWrapper,
-            NewMessageData = Memory<byte>.Empty
+            MessageOrderNumber = 1,
+            Buffer = memoryWrapper
         };
 
         for (int i = 0; i < numberOfFiles; i++)
@@ -50,7 +48,7 @@ public class RetranslationServerProto : IServerProtocol
         party.Close();
     }
 
-    private async Task<IterInfo> ReadFileData(TcpClient party, IterInfo iterInfo, CancellationToken token)
+    private async Task<StreamingInfo> ReadFileData(TcpClient party, StreamingInfo iterInfo, CancellationToken token)
     {
         var memory = iterInfo.Buffer;
         var stream = party.GetStream();
@@ -97,7 +95,7 @@ public class RetranslationServerProto : IServerProtocol
         Debug.WriteLine($"[Preamble]: Length of image stream: {dataLength}");
         Debug.WriteLine($"[Preamble]: Preamble is left buffer data: {!newMessage.IsEmpty}");
         Debug.WriteLine($"[Preamble]: totalRead before main loop: {totalRead}");
-        Debug.WriteLine($"[Preamble]: leftToRead before main loop: {leftToRead}\n\n");
+        Debug.WriteLine($"[Preamble]: leftToRead before main loop: {leftToRead}\n");
 
         while (totalRead < dataLength)
         {
@@ -107,7 +105,7 @@ public class RetranslationServerProto : IServerProtocol
             {
                 Console.WriteLine($"[RetranslationServer]: Client {party.GetRemoteEndpoint()} disconnected prematurely");
                 stream.Close();
-                return IterInfo.DisconnectedPrematurely;
+                return StreamingInfo.DisconnectedPrematurely;
             }
 
             toWrite = (int)Math.Min(read, leftToRead);
@@ -122,27 +120,12 @@ public class RetranslationServerProto : IServerProtocol
                 ImageData = memoryStream.ToArray(),
                 ImageNameData = nameBytes,
                 Uploader = party.GetRemoteEndpoint()!,
-                EventOrderNumber = iterInfo.EventOrderNumber,
+                MessageOrderNumber = iterInfo.MessageOrderNumber,
                 BatchSize = iterInfo.BatchSize
             });
 
-        iterInfo.EventOrderNumber++;
+        iterInfo.MessageOrderNumber++;
         iterInfo.NewMessageData = toWrite < read ? memory[toWrite..read] : Memory<byte>.Empty;
         return iterInfo;
-    }
-
-    private struct IterInfo
-    {
-        public int EventOrderNumber { get; set; }
-
-        public int BatchSize { get; set; }
-
-        public Memory<byte> Buffer { get; set; }
-
-        public Memory<byte> NewMessageData { get; set; }
-
-        public bool IsDisconnectedPrematurely { get; init; }
-
-        public static IterInfo DisconnectedPrematurely { get; } = new() { IsDisconnectedPrematurely = true };
     }
 }

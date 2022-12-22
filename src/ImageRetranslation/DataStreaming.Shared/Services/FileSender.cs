@@ -1,23 +1,23 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using ImageRetranslationShared.Commands;
-using ImageRetranslationShared.Extensions;
-using ImageRetranslationShared.Settings;
+using DataStreaming.Common.Constants;
+using DataStreaming.Common.Settings;
+using DataStreaming.Common.Extensions;
 
-namespace ImageRetranslationShared.Models;
+namespace DataStreaming.Services;
 
-public class ImageSender : IImageSender, IAsyncDisposable
+public class FileSender : IFileSender
 {
     private readonly ImageRetranslationSettings settings;
-    private TcpClient tcpClient;
+    private TcpClient? tcpClient;
 
-    public ImageSender(ImageRetranslationSettings settings)
+    public FileSender(ImageRetranslationSettings settings)
     {
         this.settings = settings;
     }
 
-    public async Task SendImages(string[] images, CancellationToken token)
+    public async Task SendImages(string[] filePaths, CancellationToken token)
     {
         tcpClient = new TcpClient();
         await tcpClient.ConnectAsync(IPAddress.Parse(settings.Host), settings.Port, token);
@@ -28,12 +28,13 @@ public class ImageSender : IImageSender, IAsyncDisposable
         networkStream.WriteByte((byte)ClientType.Sender);
         Console.WriteLine("completed");
 
-        networkStream.Write(images.Length.ToNetworkBytes());
+        networkStream.Write(filePaths.Length.ToNetworkBytes());
         await networkStream.FlushAsync(token);
 
-        Console.Write("Sending image stream data to server...");
-        for (int i = 0; i < images.Length; ++i)
-            await SendImage(networkStream, images[i], token);
+        Console.Write("Sending stream data to server...");
+        foreach (var path in filePaths)
+            await SendImage(networkStream, path, token);
+
         Console.WriteLine("succeeded.");
         tcpClient.Close();
     }

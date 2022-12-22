@@ -1,12 +1,10 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using ImageRetranslationShared.Commands;
-using ImageRetranslationShared.Events;
-using ImageRetranslationShared.Extensions;
-using ImageRetranslationShared.Protocols;
+using DataStreaming.Common.Constants;
+using DataStreaming.Common.Events;
+using DataStreaming.Common.Extensions;
+using DataStreaming.Common.Protocols;
 
 namespace Retranslation;
 
@@ -50,12 +48,13 @@ public class ClientProxy
 
     private async void OnImageUploaded(object? sender, ImageUploadedEventArgs e)
     {
-        // await WriteToLocalFolder(e);
-
         var dataLengthBytes = e.ImageData.Length.ToNetworkBytes();
         var nameLengthBytes = e.ImageNameData.Length.ToNetworkBytes();
         var addressBytes = e.Uploader.Address.GetAddressBytes();
         var portBytes = e.Uploader.Port.ToNetworkBytes();
+
+        int mNumber = e.MessageOrderNumber;
+        int bSize = e.BatchSize;
 
         var tasks = receiversDictionary.Values.Select(async receiver =>
         {
@@ -66,25 +65,21 @@ public class ClientProxy
             stream.Write(e.ImageData);
             stream.Write(addressBytes);
             stream.Write(portBytes);
+            if (mNumber == bSize)
+                stream.Write(Prologs.EndOfBatch.ToNetworkBytes());
             await stream.FlushAsync();
         });
 
         try
         {
             await tasks.WhenAll();
-            if (e.EventOrderNumber == e.BatchSize)
+            if (e.MessageOrderNumber == e.BatchSize)
                 Protocol.ImageUploaded -= OnImageUploaded;
         }
         catch (AggregateException exception)
         {
             Console.WriteLine(exception);
         }
-    }
-
-    private async Task WriteToLocalFolder(ImageUploadedEventArgs image)
-    {
-        await using var fs = File.Create(Path.Combine("images", Encoding.UTF8.GetString(image.ImageNameData)));
-        await fs.WriteAsync(image.ImageData);
     }
 
     private void OnClientTypeDetected(object? sender, ClientTypeDetectedEventArgs e)

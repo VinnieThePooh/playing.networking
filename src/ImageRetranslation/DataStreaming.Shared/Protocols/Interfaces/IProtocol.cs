@@ -1,6 +1,6 @@
 using System.Net.Sockets;
 
-namespace ImageRetranslationShared.Protocols;
+namespace DataStreaming.Common.Protocols;
 
 public interface IProtocol
 {
