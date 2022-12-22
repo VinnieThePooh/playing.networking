@@ -3,7 +3,7 @@ using DataStreaming.Common.Settings;
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-var settings = config.GetSection(ImageRetranslationSettings.SectionName).Get<ImageRetranslationSettings>()!;
+var settings = config.GetSection(FileRetranslationSettings.SectionName).Get<FileRetranslationSettings>()!;
 
 Console.WriteLine($"Retranslation host: {settings}");
 
@@ -17,3 +17,4 @@ IFileSender sender = new FileSender(settings);
 await sender.SendImages(images, cts.Token);
 
 Console.WriteLine($"completed");
+Console.ReadLine();

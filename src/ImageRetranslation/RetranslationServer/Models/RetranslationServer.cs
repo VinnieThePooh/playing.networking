@@ -11,9 +11,9 @@ namespace Retranslation;
 public class RetranslationServer : IRetranslationServer
 {
     private CancellationTokenSource _cts;
-    public ImageRetranslationSettings Settings { get; }
+    public FileRetranslationSettings Settings { get; }
 
-    public RetranslationServer(ImageRetranslationSettings settings)
+    public RetranslationServer(FileRetranslationSettings settings)
     {
         Settings = settings;
     }

@@ -10,9 +10,9 @@ public class ImageUploadedEventArgs
 
     public byte[] ImageNameData { get; init; }
 
-    //total count of sequential images came from receiver
+    //number of messages within the batch
     public int BatchSize { get; init; }
 
-    //within the batch of images
+    //within the batch of messages
     public int MessageOrderNumber { get; init; }
 }

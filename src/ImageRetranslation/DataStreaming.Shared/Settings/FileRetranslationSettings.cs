@@ -1,6 +1,6 @@
 namespace DataStreaming.Common.Settings;
 
-public class ImageRetranslationSettings
+public class FileRetranslationSettings
 {
     public const string SectionName = "ImageRetranslation";
 

@@ -9,10 +9,10 @@ namespace DataStreaming.Services;
 
 public class FileSender : IFileSender
 {
-    private readonly ImageRetranslationSettings settings;
+    private readonly FileRetranslationSettings settings;
     private TcpClient? tcpClient;
 
-    public FileSender(ImageRetranslationSettings settings)
+    public FileSender(FileRetranslationSettings settings)
     {
         this.settings = settings;
     }
