@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using ImageRetranslationShared.Commands;
 using ImageRetranslationShared.Events;
 using ImageRetranslationShared.Extensions;
@@ -37,6 +39,9 @@ public class ClientProxy
         if (Client is null)
             throw new InvalidOperationException("Client was not initialized");
 
+        if (!Directory.Exists("images"))
+            Directory.CreateDirectory("images");
+
         Protocol.ClientTypeDetected += OnClientTypeDetected;
         Protocol.ImageUploaded += OnImageUploaded;
 
@@ -45,6 +50,8 @@ public class ClientProxy
 
     private async void OnImageUploaded(object? sender, ImageUploadedEventArgs e)
     {
+        // await WriteToLocalFolder(e);
+
         var dataLengthBytes = e.ImageData.Length.ToNetworkBytes();
         var nameLengthBytes = e.ImageNameData.Length.ToNetworkBytes();
         var addressBytes = e.Uploader.Address.GetAddressBytes();
@@ -72,6 +79,12 @@ public class ClientProxy
         {
             Console.WriteLine(exception);
         }
+    }
+
+    private async Task WriteToLocalFolder(ImageUploadedEventArgs image)
+    {
+        await using var fs = File.Create(Path.Combine("images", Encoding.UTF8.GetString(image.ImageNameData)));
+        await fs.WriteAsync(image.ImageData);
     }
 
     private void OnClientTypeDetected(object? sender, ClientTypeDetectedEventArgs e)

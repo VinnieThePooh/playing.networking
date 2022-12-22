@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net.Sockets;
+using System.Text;
 using ImageRetranslationShared.Commands;
 using ImageRetranslationShared.Events;
 using ImageRetranslationShared.Extensions;
@@ -27,6 +28,9 @@ public class RetranslationServerProto : IServerProtocol
             return;
 
         var numberOfFiles = await stream.ReadInt(memory, token);
+        Debug.IndentLevel = 2;
+        Debug.WriteLine($"Number of files: {numberOfFiles}");
+
         var memoryWrapper = new Memory<byte>(memory);
 
         IterInfo iterInfo = new()
@@ -77,9 +81,9 @@ public class RetranslationServerProto : IServerProtocol
             //assume new data is enough to read "preamble"
             nameLength = newMessage.Span.GetHostOrderInt();
             nameBytes = newMessage[4..(nameLength + 4)].ToArray();
-            dataLength = memory[(nameLength + 4)..].Span.GetHostOrderInt64();
+            dataLength = newMessage[(nameLength + 4)..].Span.GetHostOrderInt64();
 
-            var dataLeft = memory[(nameLength + 12)..];
+            var dataLeft = newMessage[(nameLength + 12)..];
             if (!dataLeft.IsEmpty)
             {
                 leftToRead = dataLength - dataLeft.Length;
@@ -88,7 +92,12 @@ public class RetranslationServerProto : IServerProtocol
             }
         }
 
-        Debug.WriteLine($"Length of image stream: {dataLength}");
+        Debug.WriteLine($"[Preamble]: Name length: {nameLength}");
+        Debug.WriteLine($"[Preamble]: Name: {Encoding.UTF8.GetString(nameBytes)}");
+        Debug.WriteLine($"[Preamble]: Length of image stream: {dataLength}");
+        Debug.WriteLine($"[Preamble]: Preamble is left buffer data: {!newMessage.IsEmpty}");
+        Debug.WriteLine($"[Preamble]: totalRead before main loop: {totalRead}");
+        Debug.WriteLine($"[Preamble]: leftToRead before main loop: {leftToRead}\n\n");
 
         while (totalRead < dataLength)
         {
