@@ -75,6 +75,10 @@ public class FileRecieiver : IFileReceiver
         }
     }
 
+    //todo: try to refactor?
+    //todo: templated later some way?
+    //pattern detected for working with length-prefixed streams
+    //Boogie Woogie :)
     private async ValueTask<StreamingInfo> ReadFileData(TcpClient party, StreamingInfo iterInfo, CancellationToken token)
     {
         var memory = iterInfo.Buffer;
@@ -154,10 +158,11 @@ public class FileRecieiver : IFileReceiver
             await stream.ReadExactlyAsync(prologData, token);
         }
 
+        long prolog = prologData[8..].Span.GetHostOrderInt64();
+
         var senderIp = new IPAddress(prologData[..4].Span);
         var portBytes = prologData[4..8].ToArray();
         var senderPort = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(portBytes));
-        long prolog = prologData[8..].Span.GetHostOrderInt64();
 
         Debug.WriteLine($"IPAddress: {senderIp}");
         Debug.WriteLine($"Port: {senderPort}");
@@ -166,7 +171,12 @@ public class FileRecieiver : IFileReceiver
         var sender = new IPEndPoint(senderIp, senderPort);
         iterInfo.NetworkFile = new NetworkFile(fileName, memoryStream.ToArray(), sender);
         iterInfo.IsEndOfBatch = prolog.Equals(Prologs.EndOfBatch);
-        iterInfo.NewMessageData = toWrite < read ? memory[(toWrite + 16)..read] : Memory<byte>.Empty;
+
+        Memory<byte> newMessageData = Memory<byte>.Empty;
+        if (toWrite < read)
+            newMessageData = iterInfo.IsEndOfBatch ? memory[(toWrite + 16)..read] : memory[(toWrite + 8)..read];
+
+        iterInfo.NewMessageData = newMessageData;
         return iterInfo;
     }
 
