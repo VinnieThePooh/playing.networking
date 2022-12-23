@@ -61,6 +61,7 @@ public class FileRecieiver : IFileReceiver
                 Debug.WriteLine($"[FileReceiver]: RetranslationServer disconnected prematurely");
                 yield break;
             }
+            yield return iterInfo.NetworkFile!;
 
             iterInfo.MessageOrderNumber++;
             fileNames.Add(iterInfo.NetworkFile!.FileName);

@@ -48,7 +48,7 @@ public class ClientProxy
 
     private async void OnImageUploaded(object? sender, ImageUploadedEventArgs e)
     {
-        var dataLengthBytes = e.ImageData.Length.ToNetworkBytes();
+        var dataLengthBytes = ((long)e.ImageData.Length).ToNetworkBytes();
         var nameLengthBytes = e.ImageNameData.Length.ToNetworkBytes();
         var addressBytes = e.Uploader.Address.GetAddressBytes();
         var portBytes = e.Uploader.Port.ToNetworkBytes();
