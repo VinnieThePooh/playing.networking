@@ -46,31 +46,33 @@ public class FileRecieiver : IFileReceiver
             Environment.Exit(e.ErrorCode);
         }
 
-        var memory = new Memory<byte>(new byte[1024]);
-        var iterInfo = StreamingInfo.DefaultWithBuffer(memory);
+        var memory = new Memory<byte>(new byte[NetworkSettings.BufferSize]);
+        var streamingInfo = StreamingInfo.DefaultWithBuffer(memory);
 
         var fileNames = new List<string>();
 
         Console.WriteLine("Awaiting for image data...");
         while (!token.IsCancellationRequested)
         {
-            iterInfo = await ReadFileData(receiverParty, iterInfo, token);
+            streamingInfo = await ReadFileData(receiverParty, streamingInfo, token);
 
-            if (iterInfo.IsDisconnectedPrematurely)
+            if (streamingInfo.IsDisconnectedPrematurely)
             {
                 Debug.WriteLine($"[FileReceiver]: RetranslationServer disconnected prematurely");
                 yield break;
             }
-            yield return iterInfo.NetworkFile!;
 
-            iterInfo.MessageOrderNumber++;
-            fileNames.Add(iterInfo.NetworkFile!.FileName);
+            var networkFile = streamingInfo.NetworkFile!;
+            yield return networkFile;
 
-            if (iterInfo.IsEndOfBatch)
+            streamingInfo.MessageOrderNumber++;
+            fileNames.Add(streamingInfo.NetworkFile!.FileName);
+
+            if (streamingInfo.IsEndOfBatch)
             {
-                BatchLoaded?.Invoke(this, new BatchLoadedEventArgs(fileNames));
+                BatchLoaded?.Invoke(this, new BatchLoadedEventArgs(fileNames, streamingInfo.NetworkFile.Origin));
                 fileNames.Clear();
-                iterInfo = StreamingInfo.DefaultWithBuffer(memory);
+                streamingInfo = StreamingInfo.DefaultWithBuffer(memory);
             }
         }
     }

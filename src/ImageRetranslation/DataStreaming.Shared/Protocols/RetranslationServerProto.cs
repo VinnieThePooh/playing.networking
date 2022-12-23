@@ -4,6 +4,7 @@ using System.Text;
 using DataStreaming.Common.Constants;
 using DataStreaming.Common.Events;
 using DataStreaming.Common.Extensions;
+using DataStreaming.Common.Settings;
 using ImageRetranslationShared.Models;
 
 namespace DataStreaming.Common.Protocols;
@@ -13,10 +14,12 @@ public class RetranslationServerProto : IServerProtocol
     public EventHandler<ClientTypeDetectedEventArgs>? ClientTypeDetected;
     public EventHandler<ImageUploadedEventArgs>? ImageUploaded;
 
+    public FileRetranslationSettings? RetranslationSettings { get; set; }
+
     public async Task DoCommunication(TcpClient party, CancellationToken token)
     {
         var stream = party.GetStream();
-        var memory = new byte[1024];
+        var memory = new byte[RetranslationSettings?.BufferSize ?? FileRetranslationSettings.FallbackBufferSize];
 
         await stream.ReadExactlyAsync(memory, 0, 1, token);
         var clientType = (ClientType)memory[0];

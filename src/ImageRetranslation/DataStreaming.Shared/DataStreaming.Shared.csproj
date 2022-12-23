@@ -8,8 +8,4 @@
         <LangVersion>default</LangVersion>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="Infrastructure" />
-    </ItemGroup>
-
 </Project>

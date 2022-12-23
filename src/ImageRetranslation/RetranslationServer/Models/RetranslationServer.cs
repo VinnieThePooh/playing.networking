@@ -11,11 +11,11 @@ namespace Retranslation;
 public class RetranslationServer : IRetranslationServer
 {
     private CancellationTokenSource _cts;
-    public FileRetranslationSettings Settings { get; }
+    public FileRetranslationSettings RetranslationSettings { get; }
 
     public RetranslationServer(FileRetranslationSettings settings)
     {
-        Settings = settings;
+        RetranslationSettings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     public async Task<bool> Start()
@@ -26,15 +26,16 @@ public class RetranslationServer : IRetranslationServer
         _cts = new CancellationTokenSource();
         IProtocolFactory protoFactory = ImageRetranslationProtocolFactory.Create();
 
-        var listener = new TcpListener(IPAddress.Any, Settings.Port);
+        var listener = new TcpListener(IPAddress.Any, RetranslationSettings.Port);
         listener.Start();
 
-        Console.WriteLine($"[{nameof(RetranslationServer)}]: Listening at {IPAddress.Any}:{Settings.Port}");
+        Console.WriteLine($"[{nameof(RetranslationServer)}]: Listening at {IPAddress.Any}:{RetranslationSettings.Port}");
 
         while (!_cts.Token.IsCancellationRequested)
         {
             var client = await listener.AcceptTcpClientAsync(_cts.Token);
             var proto = (RetranslationServerProto)protoFactory.CreateServerProtocol();
+            proto.RetranslationSettings = RetranslationSettings;
             var clientProxy = new ClientProxy(client.GetRemoteEndpoint()!, proto, ReceiversDictionary);
             clientProxy.SetClient(client);
             //fire and forget

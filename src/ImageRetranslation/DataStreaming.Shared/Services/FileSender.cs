@@ -33,13 +33,13 @@ public class FileSender : IFileSender
 
         Console.Write("Sending stream data to server...");
         foreach (var path in filePaths)
-            await SendImage(networkStream, path, token);
+            await SendFile(networkStream, path, token);
 
         Console.WriteLine("succeeded.");
         tcpClient.Close();
     }
 
-    private async Task SendImage(NetworkStream networkStream, string filePath, CancellationToken token)
+    private async Task SendFile(NetworkStream networkStream, string filePath, CancellationToken token)
     {
         var fname = Path.GetFileName(filePath);
         await using var fs = File.Open(filePath, FileMode.Open);

@@ -17,13 +17,13 @@ Console.CancelKeyPress += (_, _) => cts.Cancel();
 try
 {
     await using IFileReceiver receiver = new FileRecieiver(settings);
+    receiver.BatchLoaded += (_, e) => Console.WriteLine($"[{e.Origin}]: batch ({e.FileNames.Count} files) completed transfer.");
 
     await foreach (var file in receiver.AwaitImageData(cts.Token))
     {
-        //todo: check for existing file names
         await using var fs = File.Create(Path.Combine(ImageFolder, file.FileName));
         await fs.WriteAsync(file.Data, cts.Token);
-        Console.WriteLine($"Created file '{file.FileName}' with image data. (Origin: {file.Origin})");
+        Console.WriteLine($"Created file '{file.FileName}' (From {file.Origin})");
     }
 }
 catch (OperationCanceledException)
