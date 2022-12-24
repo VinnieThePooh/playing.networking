@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using DataStreaming.Common.Constants;
@@ -38,19 +37,24 @@ public class RetranslationServer : IRetranslationServer
         while (!_cts.Token.IsCancellationRequested)
         {
             var client = await listener.AcceptTcpClientAsync(_cts.Token);
-            var proto = (RetranslationServerProto)protoFactory.CreateServerProtocol();
-            proto.RetranslationSettings = RetranslationSettings;
-            proto.ImageUploaded += OnImageUploaded;
-
-            var ep = client.GetRemoteEndpoint()!;
-            var clientProxy = new ClientProxy(ep, proto);
-            clientProxy.SetClient(client);
-            ClientProxies.Add(ep, clientProxy);
-
+            var clientProxy = CreateClientProxy(client, protoFactory);
+            ClientProxies.Add(clientProxy.EndPoint, clientProxy);
             _ = clientProxy.DoCommunication(_cts.Token);
         }
 
         return true;
+    }
+
+    private ClientProxy CreateClientProxy(TcpClient client, IProtocolFactory factory)
+    {
+        var proto = (RetranslationServerProto)factory.CreateServerProtocol();
+        proto.RetranslationSettings = RetranslationSettings;
+        proto.ImageUploaded += OnImageUploaded;
+
+        var ep = client.GetRemoteEndpoint()!;
+        var clientProxy = new ClientProxy(ep, proto);
+        clientProxy.SetClient(client);
+        return clientProxy;
     }
 
     private async void OnImageUploaded(object? sender, ImageUploadedEventArgs e)
@@ -63,7 +67,9 @@ public class RetranslationServer : IRetranslationServer
         int mNumber = e.MessageOrderNumber;
         int bSize = e.BatchSize;
 
-        var tasks = ClientProxies.Values.Where(p => p.ClientType == ClientType.Receiver).Select(async receiver =>
+        var tasks = ClientProxies.Values
+            .Where(p => p.ClientType == ClientType.Receiver)
+            .Select(async receiver =>
         {
             var stream = receiver.Client.GetStream();
             stream.Write(nameLengthBytes);
