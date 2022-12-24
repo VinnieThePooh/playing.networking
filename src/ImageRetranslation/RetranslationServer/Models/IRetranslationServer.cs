@@ -9,5 +9,5 @@ public interface IRetranslationServer
 
     Task<bool> Stop();
 
-    ConcurrentDictionary<IPEndPoint, ClientProxy> ReceiversDictionary { get; }
+    ConcurrentDictionary<IPEndPoint, ClientProxy> ClientProxies { get; }
 }
