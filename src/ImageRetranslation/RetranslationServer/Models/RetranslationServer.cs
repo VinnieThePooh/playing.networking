@@ -13,12 +13,14 @@ namespace Retranslation;
 public class RetranslationServer : IRetranslationServer
 {
     private CancellationTokenSource _cts;
-    public FileRetranslationSettings RetranslationSettings { get; }
 
     public RetranslationServer(FileRetranslationSettings settings)
     {
         RetranslationSettings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
+    public FileRetranslationSettings RetranslationSettings { get; }
+
+    public Dictionary<IPEndPoint, ClientProxy> ClientProxies { get; } = new();
 
     public async Task<bool> Start()
     {
@@ -40,8 +42,11 @@ public class RetranslationServer : IRetranslationServer
             proto.RetranslationSettings = RetranslationSettings;
             proto.ImageUploaded += OnImageUploaded;
 
-            var clientProxy = new ClientProxy(client.GetRemoteEndpoint()!, proto);
+            var ep = client.GetRemoteEndpoint()!;
+            var clientProxy = new ClientProxy(ep, proto);
             clientProxy.SetClient(client);
+            ClientProxies.Add(ep, clientProxy);
+
             _ = clientProxy.DoCommunication(_cts.Token);
         }
 
@@ -93,6 +98,4 @@ public class RetranslationServer : IRetranslationServer
 
         return Task.FromResult(true);
     }
-
-    public ConcurrentDictionary<IPEndPoint, ClientProxy> ClientProxies { get; } = new();
 }
