@@ -37,9 +37,6 @@ public class ClientProxy
         if (Client is null)
             throw new InvalidOperationException("Client was not initialized");
 
-        if (!Directory.Exists("images"))
-            Directory.CreateDirectory("images");
-
         Protocol.ClientTypeDetected += OnClientTypeDetected;
         Protocol.ImageUploaded += OnImageUploaded;
 
@@ -59,10 +56,10 @@ public class ClientProxy
         var tasks = receiversDictionary.Values.Select(async receiver =>
         {
             var stream = receiver.Client.GetStream();
-            await stream.WriteAsync(nameLengthBytes);
+            stream.Write(nameLengthBytes);
             stream.Write(e.ImageNameData);
             stream.Write(dataLengthBytes);
-            stream.Write(e.ImageData);
+            await stream.WriteAsync(e.ImageData);
             stream.Write(addressBytes);
             stream.Write(portBytes);
             if (mNumber == bSize)
