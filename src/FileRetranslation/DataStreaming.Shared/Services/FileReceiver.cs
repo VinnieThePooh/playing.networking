@@ -141,7 +141,7 @@ public class FileReceiver : IFileReceiver
 
             if (read == 0)
             {
-                Console.WriteLine($"[RetranslationServer]: Client {party.GetRemoteEndpoint()} disconnected prematurely");
+                Console.WriteLine($"[FileReceiver]: RetranslationServer {party.GetRemoteEndpoint()} disconnected prematurely");
                 stream.Close();
                 return StreamingInfo.DisconnectedPrematurely;
             }

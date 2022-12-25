@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.Net.Sockets;
-using System.Text;
 using DataStreaming.Common.Extensions;
 using ImageRetranslationShared.Models;
 
@@ -39,9 +37,6 @@ public static class RetranslationUtility
         }
 
         var nameLength = reserve.Span.GetHostOrderInt();
-
-        if (Encoding.UTF8.GetString(reserve[4..(nameLength + 4)].Span).Equals("скоро).jpg"))
-            Debugger.Break();
 
         result.NameLength = nameLength;
         result.NameBytes = reserve[4..(nameLength + 4)].ToArray();
