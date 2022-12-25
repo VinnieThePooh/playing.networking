@@ -94,7 +94,7 @@ public class RetranslationServer : IRetranslationServer
         try
         {
             await tasks.WhenAll();
-            Debug.WriteLine($"[RetranslationServer]: Sent file '{Encoding.UTF8.GetString(e.ImageNameData)}' to all");
+            Console.WriteLine($"[RetranslationServer]: Sent file '{Encoding.UTF8.GetString(e.ImageNameData)}' to all");
         }
         catch (AggregateException exception)
         {
