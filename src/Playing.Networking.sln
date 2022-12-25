@@ -2,19 +2,21 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CoPainter", "CoPainter", "{F635DB7E-8511-4D62-8DCB-73B349762BE4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ImageRetranslation", "ImageRetranslation", "{8CEA60B7-942E-4C66-B481-84C6D6273FEF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FileRetranslation", "FileRetranslation", "{8CEA60B7-942E-4C66-B481-84C6D6273FEF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoPainter.Client", "CoPainter\CoPainter.Client\CoPainter.Client.csproj", "{FD1D8E87-D947-4750-A1A7-806365155240}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoPainter.Server", "CoPainter\CoPainter.Server\CoPainter.Server.csproj", "{D4A0BD9F-3E3D-42FF-B4B0-2E94D8081600}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetranslationServer", "ImageRetranslation\RetranslationServer\RetranslationServer.csproj", "{BD473BE1-ABBF-4911-A425-2190E9465C83}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetranslationServer", "FileRetranslation\RetranslationServer\RetranslationServer.csproj", "{BD473BE1-ABBF-4911-A425-2190E9465C83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetranslationReceiver", "ImageRetranslation\RetranslationReceiver\RetranslationReceiver.csproj", "{A607317C-29D7-4017-9AA1-7B71DB132FF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetranslationReceiver", "FileRetranslation\RetranslationReceiver\RetranslationReceiver.csproj", "{A607317C-29D7-4017-9AA1-7B71DB132FF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStreaming.Shared", "ImageRetranslation\DataStreaming.Shared\DataStreaming.Shared.csproj", "{CBFDE5B8-C5CC-4C9D-B76C-198F5E2BD1C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStreaming.Shared", "FileRetranslation\DataStreaming.Shared\DataStreaming.Shared.csproj", "{CBFDE5B8-C5CC-4C9D-B76C-198F5E2BD1C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageSourceClient", "ImageRetranslation\ImageSourceClient\ImageSourceClient.csproj", "{46CC054D-10E0-4F21-AACD-4F5440FAE310}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSourceClient", "FileRetranslation\FileSourceClient\FileSourceClient.csproj", "{46CC054D-10E0-4F21-AACD-4F5440FAE310}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C2C24BA3-9291-45AF-88C5-9BA72F8870F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
