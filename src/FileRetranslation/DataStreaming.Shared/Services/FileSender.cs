@@ -44,7 +44,7 @@ public class FileSender : IFileSender
         var fname = Path.GetFileName(filePath);
         await using var fs = File.Open(filePath, FileMode.Open);
 
-        networkStream.Write(fname.Length.ToNetworkBytes());
+        networkStream.Write(fname.GetUtf8BytesCount().ToNetworkBytes());
         networkStream.Write(Encoding.UTF8.GetBytes(fname));
         networkStream.Write(fs.Length.ToNetworkBytes());
         await fs.CopyToAsync(networkStream, token);

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace DataStreaming.Common.Extensions;
 
@@ -47,4 +48,6 @@ public static class NetworkExtensions
         await stream.ReadExactlyAsync(properSlice, token);
         return properSlice.Span.GetHostOrderInt64();
     }
+
+    public static int GetUtf8BytesCount(this string str) => Encoding.UTF8.GetByteCount(str);
 }
