@@ -7,17 +7,18 @@ using DataStreaming.Common.Constants;
 using DataStreaming.Common.Events;
 using DataStreaming.Common.Extensions;
 using DataStreaming.Common.Settings;
+using ImageRetranslationShared.Infrastructure;
 using ImageRetranslationShared.Models;
 
 namespace DataStreaming.Services;
 
-public class FileRecieiver : IFileReceiver
+public class FileReceiver : IFileReceiver
 {
     private TcpClient? receiverParty;
 
     public event EventHandler<BatchLoadedEventArgs>? BatchLoaded;
 
-    public FileRecieiver(FileRetranslationSettings networkSettings)
+    public FileReceiver(FileRetranslationSettings networkSettings)
     {
         NetworkSettings = networkSettings ?? throw new ArgumentNullException(nameof(networkSettings));
     }
@@ -108,12 +109,15 @@ public class FileRecieiver : IFileReceiver
         }
         else
         {
-            //assume new data is enough to read "preamble"
-            nameLength = newMessage.Span.GetHostOrderInt();
-            nameBytes = newMessage[4..(nameLength + 4)].ToArray();
-            dataLength = newMessage[(nameLength + 4)..].Span.GetHostOrderInt64();
+            var readResult = RetranslationUtility.ReadPreamble(newMessage, stream);
+            if (!readResult.IsDisconnectedPrematurely)
+                return StreamingInfo.DisconnectedPrematurely;
 
-            var dataLeft = newMessage[(nameLength + 12)..];
+            dataLength = readResult.DataLength;
+            nameLength = readResult.NameLength;
+            nameBytes = readResult.NameBytes;
+
+            var dataLeft = readResult.DataLeft;
             if (!dataLeft.IsEmpty)
             {
                 leftToRead = dataLength - dataLeft.Length;
@@ -175,8 +179,20 @@ public class FileRecieiver : IFileReceiver
         iterInfo.IsEndOfBatch = prolog.Equals(Prologs.EndOfBatch);
 
         Memory<byte> newMessageData = Memory<byte>.Empty;
+
         if (toWrite < read)
-            newMessageData = iterInfo.IsEndOfBatch ? memory[(toWrite + 16)..read] : memory[(toWrite + 8)..read];
+        {
+            try
+            {
+                newMessageData = iterInfo.IsEndOfBatch ? memory[(toWrite + 16)..read] : memory[(toWrite + 8)..read];
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+
+                throw;
+            }
+        }
 
         iterInfo.NewMessageData = newMessageData;
         return iterInfo;

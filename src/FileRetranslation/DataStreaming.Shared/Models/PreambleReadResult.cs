@@ -1,6 +1,6 @@
 namespace ImageRetranslationShared.Models;
 
-internal struct PreambleReadResult
+public struct PreambleReadResult
 {
     public bool ReadFromBufferOnly { get; set; }
 
