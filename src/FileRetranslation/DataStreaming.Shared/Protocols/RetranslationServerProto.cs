@@ -44,13 +44,25 @@ public class RetranslationServerProto : IServerProtocol
 
         for (int i = 0; i < numberOfFiles; i++)
         {
-            iterInfo = await ReadFileData(party, iterInfo, token);
+            try
+            {
+                iterInfo = await ReadFileData(party, iterInfo, token);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+
+                throw;
+            }
+
             if (iterInfo.IsDisconnectedPrematurely)
                 break;
         }
+
         party.Close();
     }
 
+    //todo: refactor, add logging
     private async Task<StreamingInfo> ReadFileData(TcpClient party, StreamingInfo iterInfo, CancellationToken token)
     {
         var memory = iterInfo.Buffer;
@@ -79,15 +91,18 @@ public class RetranslationServerProto : IServerProtocol
         }
         else
         {
-            //assume new data is enough to read "preamble"
-            nameLength = newMessage.Span.GetHostOrderInt();
-            nameBytes = newMessage[4..(nameLength + 4)].ToArray();
-            dataLength = newMessage[(nameLength + 4)..].Span.GetHostOrderInt64();
+            var readResult = ReadPreamble(newMessage, stream);
+            if (readResult.IsDisconnectedPrematurely)
+                return StreamingInfo.DisconnectedPrematurely;
 
-            var dataLeft = newMessage[(nameLength + 12)..];
+            nameBytes = readResult.NameBytes;
+            nameLength = readResult.NameLength;
+            dataLength = readResult.DataLength;
+
+            var dataLeft = readResult.DataLeft;
             if (!dataLeft.IsEmpty)
             {
-                leftToRead = dataLength - dataLeft.Length;
+                leftToRead = readResult.DataLength - dataLeft.Length;
                 totalRead = dataLeft.Length;
                 await memoryStream.WriteAsync(dataLeft, token);
             }
@@ -106,8 +121,10 @@ public class RetranslationServerProto : IServerProtocol
 
             if (read == 0)
             {
-                Console.WriteLine($"[RetranslationServer]: Client {party.GetRemoteEndpoint()} disconnected prematurely");
+                Console.WriteLine(
+                    $"[RetranslationServer]: Client {party.GetRemoteEndpoint()} disconnected prematurely");
                 stream.Close();
+
                 return StreamingInfo.DisconnectedPrematurely;
             }
 
@@ -129,6 +146,45 @@ public class RetranslationServerProto : IServerProtocol
 
         iterInfo.MessageOrderNumber++;
         iterInfo.NewMessageData = toWrite < read ? memory[toWrite..read] : Memory<byte>.Empty;
+
         return iterInfo;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="newMessage"></param>
+    /// <param name="stream"></param>
+    /// <param name="preambulaReserveSize">512 bytes - MAX for dynamic name (up to 512 latin characters or 254 cyrillic). Plus extra 8 for dataLength</param>
+    /// <returns></returns>
+    private PreambleReadResult ReadPreamble(Memory<byte> newMessage, NetworkStream stream, int preambulaReserveSize = 520)
+    {
+        PreambleReadResult result = new();
+        Memory<byte> reserve;
+
+        //4 + n + 8 - required bytes to read preamble
+        //single read operation
+        if (newMessage.Length < preambulaReserveSize)
+        {
+            reserve = new Memory<byte>(new byte[preambulaReserveSize]);
+            newMessage.CopyTo(reserve);
+            var free = reserve[newMessage.Length..];
+            //assume we read free.Length always or 0 - according to protocol
+            var read = stream.Read(free.Span);
+            if (read == 0)
+                return PreambleReadResult.DisconnectedPrematurely;
+        }
+        else
+        {
+            reserve = newMessage;
+            result.ReadFromBufferOnly = true;
+        }
+
+        var nameLength = reserve.Span.GetHostOrderInt();
+        result.NameLength = nameLength;
+        result.NameBytes = reserve[4..(nameLength + 4)].ToArray();
+        result.DataLength = reserve[(nameLength + 4)..].Span.GetHostOrderInt64();
+        result.DataLeft = reserve[(nameLength + 12)..];
+        return result;
     }
 }
