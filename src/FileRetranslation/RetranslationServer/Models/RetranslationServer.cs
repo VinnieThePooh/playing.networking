@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using DataStreaming.Common.Constants;
 using DataStreaming.Common.Events;
 using DataStreaming.Common.Extensions;
@@ -67,6 +69,12 @@ public class RetranslationServer : IRetranslationServer
         int mNumber = e.MessageOrderNumber;
         int bSize = e.BatchSize;
 
+        // if (Directory.Exists("images"))
+        //     Directory.CreateDirectory("images");
+        //
+        // await using (var fs = File.Create(Path.Combine("images", Encoding.UTF8.GetString(e.ImageNameData))))
+        //     await fs.WriteAsync(e.ImageData);
+
         var tasks = ClientProxies.Values
             .Where(p => p.ClientType == ClientType.Receiver)
             .Select(async receiver =>
@@ -86,6 +94,7 @@ public class RetranslationServer : IRetranslationServer
         try
         {
             await tasks.WhenAll();
+            Debug.WriteLine($"[RetranslationServer]: Sent file '{Encoding.UTF8.GetString(e.ImageNameData)}' to all");
         }
         catch (AggregateException exception)
         {

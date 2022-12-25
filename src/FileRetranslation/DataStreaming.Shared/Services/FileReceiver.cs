@@ -81,7 +81,6 @@ public class FileReceiver : IFileReceiver
     //todo: try to refactor?
     //todo: templated later some way?
     //pattern detected for working with length-prefixed streams
-    //Boogie Woogie :)
     private async ValueTask<StreamingInfo> ReadFileData(TcpClient party, StreamingInfo iterInfo, CancellationToken token)
     {
         var memory = iterInfo.Buffer;
@@ -110,7 +109,7 @@ public class FileReceiver : IFileReceiver
         else
         {
             var readResult = RetranslationUtility.ReadPreamble(newMessage, stream);
-            if (!readResult.IsDisconnectedPrematurely)
+            if (readResult.IsDisconnectedPrematurely)
                 return StreamingInfo.DisconnectedPrematurely;
 
             dataLength = readResult.DataLength;

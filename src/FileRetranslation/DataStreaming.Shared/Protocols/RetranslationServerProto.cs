@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.Net.Sockets;
-using System.Text;
 using DataStreaming.Common.Constants;
 using DataStreaming.Common.Events;
 using DataStreaming.Common.Extensions;
@@ -109,12 +107,12 @@ public class RetranslationServerProto : IServerProtocol
             }
         }
 
-        Debug.WriteLine($"[Preamble]: Name length: {nameLength}");
-        Debug.WriteLine($"[Preamble]: Name: {Encoding.UTF8.GetString(nameBytes)}");
-        Debug.WriteLine($"[Preamble]: Length of image stream: {dataLength}");
-        Debug.WriteLine($"[Preamble]: Preamble is left buffer data: {!newMessage.IsEmpty}");
-        Debug.WriteLine($"[Preamble]: totalRead before main loop: {totalRead}");
-        Debug.WriteLine($"[Preamble]: leftToRead before main loop: {leftToRead}\n");
+        // Debug.WriteLine($"[Preamble]: Name length: {nameLength}");
+        // Debug.WriteLine($"[Preamble]: Name: {Encoding.UTF8.GetString(nameBytes)}");
+        // Debug.WriteLine($"[Preamble]: Length of image stream: {dataLength}");
+        // Debug.WriteLine($"[Preamble]: Preamble is left buffer data: {!newMessage.IsEmpty}");
+        // Debug.WriteLine($"[Preamble]: totalRead before main loop: {totalRead}");
+        // Debug.WriteLine($"[Preamble]: leftToRead before main loop: {leftToRead}\n");
 
         while (totalRead < dataLength)
         {

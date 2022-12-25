@@ -6,8 +6,9 @@ namespace ImageRetranslationShared.Infrastructure;
 
 public static class RetranslationUtility
 {
+    //preamble should actually be of a fixed size, but ok now
     /// <summary>
-    /// 
+    ///  Read variable length message preamble
     /// </summary>
     /// <param name="newMessage"></param>
     /// <param name="stream"></param>
