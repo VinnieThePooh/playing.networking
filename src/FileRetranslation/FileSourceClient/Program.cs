@@ -8,13 +8,11 @@ var settings = config.GetSection(FileRetranslationSettings.SectionName).Get<File
 Console.WriteLine($"Retranslation host: {settings}");
 
 var cts = new CancellationTokenSource();
+var images = Directory.EnumerateFiles("Images");
 
-string[] images = Directory.EnumerateFiles("Images").ToArray();
+Console.Write($"Sending {images.Count()} to Retranslation host...");
 
-Console.Write($"Sending {images.Length} to Retranslation host...");
-
-IFileSender sender = new FileSender(settings);
+await using IFileSender sender = new FileSender(settings);
 await sender.SendImages(images, cts.Token);
 
 Console.WriteLine($"completed");
-Console.ReadLine();
