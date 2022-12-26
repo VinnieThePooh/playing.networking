@@ -17,7 +17,7 @@ public class FileSender : IFileSender
         this.settings = settings;
     }
 
-    public async Task SendImages(string[] filePaths, CancellationToken token)
+    public async Task SendImages(IEnumerable<string> filePaths, CancellationToken token)
     {
         tcpClient = new TcpClient();
         await tcpClient.ConnectAsync(IPAddress.Parse(settings.Host), settings.Port, token);
@@ -28,7 +28,7 @@ public class FileSender : IFileSender
         networkStream.WriteByte((byte)ClientType.Sender);
         Console.WriteLine("completed");
 
-        networkStream.Write(filePaths.Length.ToNetworkBytes());
+        networkStream.Write(filePaths.Count().ToNetworkBytes());
         await networkStream.FlushAsync(token);
 
         Console.Write("Sending stream data to server...");
