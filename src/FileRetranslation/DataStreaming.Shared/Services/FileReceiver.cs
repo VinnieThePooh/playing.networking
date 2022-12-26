@@ -25,7 +25,7 @@ public class FileReceiver : IFileReceiver
 
     public FileRetranslationSettings NetworkSettings { get; }
 
-    public async IAsyncEnumerable<NetworkFile> AwaitImageData([EnumeratorCancellation] CancellationToken token)
+    public async IAsyncEnumerable<NetworkFile> AwaitFiles([EnumeratorCancellation] CancellationToken token)
     {
         receiverParty = new();
 

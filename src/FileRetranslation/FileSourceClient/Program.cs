@@ -13,6 +13,6 @@ var images = Directory.EnumerateFiles("Images");
 Console.Write($"Sending {images.Count()} to Retranslation host...");
 
 await using IFileSender sender = new FileSender(settings);
-await sender.SendImages(images, cts.Token);
+await sender.SendFiles(images, cts.Token);
 
 Console.WriteLine($"completed");

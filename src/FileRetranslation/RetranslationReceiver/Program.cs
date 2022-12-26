@@ -19,7 +19,7 @@ try
     await using IFileReceiver receiver = new FileReceiver(settings);
     receiver.BatchLoaded += (_, e) => Console.WriteLine($"[{e.Origin}]: batch ({e.FileNames.Count} files) completed transfer.");
 
-    await foreach (var file in receiver.AwaitImageData(cts.Token))
+    await foreach (var file in receiver.AwaitFiles(cts.Token))
     {
         await using var fs = File.Create(Path.Combine(ImageFolder, file.FileName));
         await fs.WriteAsync(file.Data, cts.Token);

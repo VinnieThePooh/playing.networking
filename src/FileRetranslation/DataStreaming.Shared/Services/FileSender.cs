@@ -17,7 +17,7 @@ public class FileSender : IFileSender
         this.settings = settings;
     }
 
-    public async Task SendImages(IEnumerable<string> filePaths, CancellationToken token)
+    public async Task SendFiles(IEnumerable<string> filePaths, CancellationToken token)
     {
         tcpClient = new TcpClient();
         await tcpClient.ConnectAsync(IPAddress.Parse(settings.Host), settings.Port, token);
