@@ -9,10 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DataStreaming.Shared\DataStreaming.Shared.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.1" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
@@ -31,6 +27,10 @@
       <None Update="Images\lost a ball.jpg">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\DataStreaming.Shared\src\DataStreaming.Shared.csproj" />
     </ItemGroup>
 
 </Project>
