@@ -29,7 +29,7 @@ public class RetranslationServer : IRetranslationServer
                 return false;
 
         _cts = new CancellationTokenSource();
-        IProtocolFactory protoFactory = ImageRetranslationProtocolFactory.Create();
+        IProtocolFactory protoFactory = FileRetranslationProtocolFactory.Create();
 
         var listener = new TcpListener(IPAddress.Any, RetranslationSettings.Port);
         listener.Start();
