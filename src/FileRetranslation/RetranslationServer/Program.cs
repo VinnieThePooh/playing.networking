@@ -1,4 +1,4 @@
-﻿using DataStreaming.Common.Settings;
+﻿using ImageRetranslationShared.Settings;
 using Microsoft.Extensions.Configuration;
 using Retranslation;
 

@@ -1,5 +1,6 @@
-﻿using DataStreaming.Common.Settings;
-using DataStreaming.Services;
+﻿using ImageRetranslationShared.Services.FileTransfer;
+using ImageRetranslationShared.Services.Interfaces;
+using ImageRetranslationShared.Settings;
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
