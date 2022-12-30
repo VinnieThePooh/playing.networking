@@ -29,8 +29,8 @@
       </None>
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\DataStreaming.Shared\src\DataStreaming.Shared.csproj" />
+    <ItemGroup>      
+      <ProjectReference Include="..\..\DataStreaming.Shared\src\DataStreaming.Shared\DataStreaming.Shared.csproj" />
     </ItemGroup>
 
 </Project>

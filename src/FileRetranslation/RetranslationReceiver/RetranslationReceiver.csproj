@@ -19,8 +19,8 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\DataStreaming.Shared\src\DataStreaming.Shared.csproj" />
+    <ItemGroup>      
+      <ProjectReference Include="..\..\DataStreaming.Shared\src\DataStreaming.Shared\DataStreaming.Shared.csproj" />
     </ItemGroup>
 
 </Project>
