@@ -1,0 +1,3 @@
+[submodule "DataStreaming.Shared"]
+	path = src/DataStreaming.Shared
+	url = https://github.com/VinnieThePooh/datastreaming.shared.git

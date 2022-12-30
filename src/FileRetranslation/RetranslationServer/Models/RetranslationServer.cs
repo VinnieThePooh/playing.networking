@@ -62,8 +62,8 @@ public class RetranslationServer : IRetranslationServer
 
     private async void OnImageUploaded(object? sender, ImageUploadedEventArgs e)
     {
-        var dataLengthBytes = ((long)e.ImageData.Length).ToNetworkBytes();
-        var nameLengthBytes = e.ImageNameData.Length.ToNetworkBytes();
+        var dataLengthBytes = ((long)e.FileData.Length).ToNetworkBytes();
+        var nameLengthBytes = e.FileData.Length.ToNetworkBytes();
         var addressBytes = e.Uploader.Address.GetAddressBytes();
         var portBytes = e.Uploader.Port.ToNetworkBytes();
 
@@ -82,9 +82,9 @@ public class RetranslationServer : IRetranslationServer
         {
             var stream = receiver.Client.GetStream();
             stream.Write(nameLengthBytes);
-            stream.Write(e.ImageNameData);
+            stream.Write(e.FileNameData);
             stream.Write(dataLengthBytes);
-            await stream.WriteAsync(e.ImageData);
+            await stream.WriteAsync(e.FileData);
             stream.Write(addressBytes);
             stream.Write(portBytes);
             if (mNumber == bSize)
@@ -95,7 +95,7 @@ public class RetranslationServer : IRetranslationServer
         try
         {
             await tasks.WhenAll();
-            Console.WriteLine($"[RetranslationServer]: Sent file '{Encoding.UTF8.GetString(e.ImageNameData)}' to all");
+            Console.WriteLine($"[RetranslationServer]: Sent file '{Encoding.UTF8.GetString(e.FileNameData)}' to all");
         }
         catch (AggregateException exception)
         {
