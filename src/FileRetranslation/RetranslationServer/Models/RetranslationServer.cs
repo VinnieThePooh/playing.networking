@@ -69,12 +69,6 @@ public class RetranslationServer : IRetranslationServer
         int mNumber = e.MessageOrderNumber;
         int bSize = e.BatchSize;
 
-        // if (Directory.Exists("images"))
-        //     Directory.CreateDirectory("images");
-        //
-        // await using (var fs = File.Create(Path.Combine("images", Encoding.UTF8.GetString(e.ImageNameData))))
-        //     await fs.WriteAsync(e.ImageData);
-
         var tasks = ClientProxies.Values
             .Where(p => p.ClientType == ClientType.Receiver)
             .Select(async receiver =>
