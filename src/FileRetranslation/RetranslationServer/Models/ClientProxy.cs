@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Sockets;
-using ImageRetranslationShared.Constants;
-using ImageRetranslationShared.Events;
-using ImageRetranslationShared.Protocols;
+using DataStreaming.Common.Protocols;
+using DataStreaming.Constants;
+using DataStreaming.Events;
 
 namespace Retranslation;
 

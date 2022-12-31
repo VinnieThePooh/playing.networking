@@ -1,14 +1,13 @@
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using ImageRetranslationShared.Constants;
-using ImageRetranslationShared.Events;
-using ImageRetranslationShared.Extensions;
-using ImageRetranslationShared.Protocols;
-using ImageRetranslationShared.Protocols.Factories;
-using ImageRetranslationShared.Protocols.Interfaces;
-using ImageRetranslationShared.Settings;
+using DataStreaming.Common.Protocols;
+using DataStreaming.Common.Protocols.Factories;
+using DataStreaming.Constants;
+using DataStreaming.Events;
+using DataStreaming.Extensions;
+using DataStreaming.Protocols.Interfaces;
+using DataStreaming.Settings;
 
 namespace Retranslation;
 
