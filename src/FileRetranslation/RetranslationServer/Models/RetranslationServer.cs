@@ -62,7 +62,7 @@ public class RetranslationServer : IRetranslationServer
     private async void OnImageUploaded(object? sender, ImageUploadedEventArgs e)
     {
         var dataLengthBytes = ((long)e.FileData.Length).ToNetworkBytes();
-        var nameLengthBytes = e.FileData.Length.ToNetworkBytes();
+        var nameLengthBytes = e.FileNameData.Length.ToNetworkBytes();
         var addressBytes = e.Uploader.Address.GetAddressBytes();
         var portBytes = e.Uploader.Port.ToNetworkBytes();
 
