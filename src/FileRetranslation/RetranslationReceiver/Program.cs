@@ -1,5 +1,5 @@
-﻿using DataStreaming.Services;
-using DataStreaming.Services.FileTransfer;
+﻿using DataStreaming.Services.FileTransfer;
+using DataStreaming.Services.Interfaces;
 using DataStreaming.Settings;
 using Microsoft.Extensions.Configuration;
 
